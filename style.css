@@ -2,7 +2,7 @@
    GP GONDA – EVENT PAYMENT TRACKER
    Dark Premium Theme
    ============================================= */
-
+ 
 :root {
   --bg-base:       #0a0a0f;
   --bg-surface:    #111118;
@@ -26,15 +26,15 @@
   --radius-lg:     20px;
   --transition:    0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
+ 
 /* ---- RESET ---- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
 html {
   scroll-behavior: smooth;
   font-size: 16px;
 }
-
+ 
 body {
   font-family: var(--font-body);
   background-color: var(--bg-base);
@@ -43,7 +43,7 @@ body {
   overflow-x: hidden;
   line-height: 1.6;
 }
-
+ 
 /* ---- BACKGROUND DECORATION ---- */
 .bg-grid {
   position: fixed;
@@ -55,7 +55,7 @@ body {
   pointer-events: none;
   z-index: 0;
 }
-
+ 
 .bg-glow {
   position: fixed;
   top: -200px;
@@ -66,7 +66,7 @@ body {
   pointer-events: none;
   z-index: 0;
 }
-
+ 
 /* ---- HEADER ---- */
 .site-header {
   position: sticky;
@@ -76,7 +76,7 @@ body {
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
 }
-
+ 
 .header-inner {
   max-width: 1200px;
   margin: 0 auto;
@@ -85,33 +85,28 @@ body {
   align-items: center;
   justify-content: space-between;
 }
-
+ 
 .college-logo {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
-
-.logo-icon {
+ 
+.logo-img {
   width: 46px;
   height: 46px;
-  background: var(--accent);
-  color: #000;
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  object-fit: contain;
   border-radius: var(--radius-sm);
-  letter-spacing: 1px;
+  background: #fff;
+  padding: 3px;
   flex-shrink: 0;
 }
-
+ 
 .logo-text {
   display: flex;
   flex-direction: column;
 }
-
+ 
 .college-name {
   font-family: var(--font-display);
   font-size: 1.35rem;
@@ -119,7 +114,7 @@ body {
   color: var(--text-primary);
   line-height: 1.1;
 }
-
+ 
 .college-sub {
   font-size: 0.72rem;
   color: var(--accent);
@@ -127,7 +122,7 @@ body {
   text-transform: uppercase;
   margin-top: 2px;
 }
-
+ 
 .header-badge {
   font-size: 0.72rem;
   font-family: var(--font-mono);
@@ -139,7 +134,7 @@ body {
   border-radius: 999px;
   opacity: 0.8;
 }
-
+ 
 /* ---- HERO ---- */
 .hero {
   position: relative;
@@ -153,7 +148,7 @@ body {
   gap: 4rem;
   min-height: 90vh;
 }
-
+ 
 .hero-tag {
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -172,7 +167,7 @@ body {
   height: 1px;
   background: var(--accent);
 }
-
+ 
 .hero-title {
   font-family: var(--font-display);
   font-size: clamp(3.5rem, 6vw, 5.5rem);
@@ -181,12 +176,12 @@ body {
   color: var(--text-primary);
   margin-bottom: 1.5rem;
 }
-
+ 
 .hero-accent {
   color: var(--accent);
   display: block;
 }
-
+ 
 .hero-desc {
   font-size: 1.05rem;
   color: var(--text-secondary);
@@ -194,18 +189,18 @@ body {
   line-height: 1.8;
   margin-bottom: 2.5rem;
 }
-
+ 
 .hero-stats {
   display: flex;
   align-items: center;
   gap: 1.5rem;
 }
-
+ 
 .hstat {
   display: flex;
   flex-direction: column;
 }
-
+ 
 .hstat-num {
   font-family: var(--font-display);
   font-size: 2rem;
@@ -213,7 +208,7 @@ body {
   color: var(--text-primary);
   line-height: 1;
 }
-
+ 
 .hstat-label {
   font-size: 0.72rem;
   letter-spacing: 3px;
@@ -221,19 +216,19 @@ body {
   color: var(--text-muted);
   margin-top: 4px;
 }
-
+ 
 .hstat-divider {
   width: 1px;
   height: 40px;
   background: var(--border);
 }
-
+ 
 /* ---- SIGNUP CARD ---- */
 .hero-card-wrap {
   position: relative;
   z-index: 1;
 }
-
+ 
 .signup-card, .success-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -243,7 +238,7 @@ body {
   overflow: hidden;
   animation: slideUp 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
-
+ 
 .signup-card::before {
   content: '';
   position: absolute;
@@ -253,12 +248,12 @@ body {
   height: 2px;
   background: linear-gradient(90deg, transparent, var(--accent), transparent);
 }
-
+ 
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(30px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
+ 
 .card-step {
   font-family: var(--font-mono);
   font-size: 0.7rem;
@@ -267,7 +262,7 @@ body {
   color: var(--accent);
   margin-bottom: 0.6rem;
 }
-
+ 
 .card-title {
   font-family: var(--font-display);
   font-size: 2rem;
@@ -275,18 +270,18 @@ body {
   color: var(--text-primary);
   margin-bottom: 0.4rem;
 }
-
+ 
 .card-subtitle {
   font-size: 0.88rem;
   color: var(--text-secondary);
   margin-bottom: 2rem;
 }
-
+ 
 /* ---- FORM FIELDS ---- */
 .field-group {
   margin-bottom: 1.5rem;
 }
-
+ 
 .field-label {
   display: flex;
   align-items: center;
@@ -298,16 +293,16 @@ body {
   margin-bottom: 0.55rem;
   font-weight: 500;
 }
-
+ 
 .label-icon {
   color: var(--accent);
   font-size: 0.6rem;
 }
-
+ 
 .input-wrap {
   position: relative;
 }
-
+ 
 .input-wrap input,
 .input-wrap select {
   width: 100%;
@@ -323,24 +318,24 @@ body {
   appearance: none;
   -webkit-appearance: none;
 }
-
+ 
 .input-wrap input::placeholder {
   color: var(--text-muted);
 }
-
+ 
 .input-wrap input:focus,
 .input-wrap select:focus {
   border-color: var(--accent);
   background: #1f1f2c;
   box-shadow: 0 0 0 3px var(--accent-dim);
 }
-
+ 
 .input-wrap input.error,
 .input-wrap select.error {
   border-color: var(--danger);
   box-shadow: 0 0 0 3px rgba(255,78,78,0.12);
 }
-
+ 
 .select-wrap select {
   padding-right: 2.5rem;
   cursor: pointer;
@@ -349,7 +344,7 @@ body {
   background: var(--bg-card);
   color: var(--text-primary);
 }
-
+ 
 .select-arrow {
   position: absolute;
   right: 1rem;
@@ -359,11 +354,11 @@ body {
   font-size: 0.7rem;
   pointer-events: none;
 }
-
+ 
 .input-line {
   display: none;
 }
-
+ 
 .field-error {
   display: block;
   font-size: 0.78rem;
@@ -372,7 +367,7 @@ body {
   min-height: 1em;
   font-family: var(--font-mono);
 }
-
+ 
 /* ---- SUBMIT BUTTON ---- */
 .submit-btn {
   width: 100%;
@@ -394,7 +389,7 @@ body {
   position: relative;
   overflow: hidden;
 }
-
+ 
 .submit-btn::after {
   content: '';
   position: absolute;
@@ -402,41 +397,41 @@ body {
   background: rgba(255,255,255,0);
   transition: background 0.2s;
 }
-
+ 
 .submit-btn:hover {
   background: #ffc233;
   box-shadow: 0 0 30px var(--accent-glow);
   transform: translateY(-2px);
 }
-
+ 
 .submit-btn:active {
   transform: translateY(0);
 }
-
+ 
 .submit-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
-
+ 
 .btn-loader {
   letter-spacing: 4px;
   animation: blink 1s infinite;
   font-size: 0.8rem;
 }
-
+ 
 @keyframes blink {
   0%,100% { opacity: 1; }
   50%      { opacity: 0.3; }
 }
-
+ 
 .login-link {
   text-align: center;
   margin-top: 1.2rem;
   font-size: 0.85rem;
   color: var(--text-muted);
 }
-
+ 
 .login-link a {
   color: var(--accent);
   text-decoration: none;
@@ -445,12 +440,12 @@ body {
 .login-link a:hover {
   text-decoration: underline;
 }
-
+ 
 /* ---- SUCCESS CARD ---- */
 .success-card {
   text-align: center;
 }
-
+ 
 .success-icon {
   width: 72px;
   height: 72px;
@@ -465,12 +460,12 @@ body {
   margin: 0 auto 1.5rem;
   animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
 }
-
+ 
 @keyframes popIn {
   from { opacity: 0; transform: scale(0.5); }
   to   { opacity: 1; transform: scale(1); }
 }
-
+ 
 .success-title {
   font-family: var(--font-display);
   font-size: 2rem;
@@ -478,13 +473,13 @@ body {
   color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
-
+ 
 .success-msg {
   font-size: 0.95rem;
   color: var(--text-secondary);
   margin-bottom: 2rem;
 }
-
+ 
 .success-details {
   background: var(--bg-input);
   border: 1px solid var(--border);
@@ -493,7 +488,7 @@ body {
   margin-bottom: 2rem;
   text-align: left;
 }
-
+ 
 .success-details .detail-row {
   display: flex;
   justify-content: space-between;
@@ -502,24 +497,24 @@ body {
   border-bottom: 1px solid var(--border);
   font-size: 0.9rem;
 }
-
+ 
 .success-details .detail-row:last-child {
   border-bottom: none;
 }
-
+ 
 .success-details .detail-label {
   color: var(--text-muted);
   font-size: 0.75rem;
   letter-spacing: 2px;
   text-transform: uppercase;
 }
-
+ 
 .success-details .detail-val {
   color: var(--text-primary);
   font-family: var(--font-mono);
   font-size: 0.88rem;
 }
-
+ 
 /* ---- FEATURES SECTION ---- */
 .features-section {
   position: relative;
@@ -529,7 +524,7 @@ body {
   padding: 5rem 2rem;
   border-top: 1px solid var(--border);
 }
-
+ 
 .section-label {
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -538,7 +533,7 @@ body {
   color: var(--accent);
   margin-bottom: 1rem;
 }
-
+ 
 .section-title {
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 4vw, 3.5rem);
@@ -546,13 +541,13 @@ body {
   color: var(--text-primary);
   margin-bottom: 3rem;
 }
-
+ 
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.5rem;
 }
-
+ 
 .feature-card {
   background: var(--bg-card);
   border: 1px solid var(--border);
@@ -561,17 +556,17 @@ body {
   transition: border-color var(--transition), transform var(--transition);
   cursor: default;
 }
-
+ 
 .feature-card:hover {
   border-color: var(--accent);
   transform: translateY(-4px);
 }
-
+ 
 .feat-icon {
   font-size: 2rem;
   margin-bottom: 1rem;
 }
-
+ 
 .feature-card h3 {
   font-family: var(--font-display);
   font-size: 1.4rem;
@@ -579,13 +574,13 @@ body {
   color: var(--text-primary);
   margin-bottom: 0.6rem;
 }
-
+ 
 .feature-card p {
   font-size: 0.9rem;
   color: var(--text-secondary);
   line-height: 1.7;
 }
-
+ 
 /* ---- FOOTER ---- */
 .site-footer {
   position: relative;
@@ -593,7 +588,7 @@ body {
   border-top: 1px solid var(--border);
   padding: 1.5rem 2rem;
 }
-
+ 
 .footer-inner {
   max-width: 1200px;
   margin: 0 auto;
@@ -603,26 +598,26 @@ body {
   flex-wrap: wrap;
   gap: 0.5rem;
 }
-
+ 
 .footer-college {
   font-family: var(--font-display);
   font-size: 1rem;
   letter-spacing: 2px;
   color: var(--text-secondary);
 }
-
+ 
 .footer-copy {
   font-size: 0.8rem;
   color: var(--text-muted);
   font-family: var(--font-mono);
 }
-
+ 
 /* ---- FIELD VALID INDICATOR ---- */
 .field-group.valid .input-wrap input,
 .field-group.valid .input-wrap select {
   border-color: var(--success);
 }
-
+ 
 /* ---- RESPONSIVE ---- */
 @media (max-width: 900px) {
   .hero {
@@ -631,33 +626,33 @@ body {
     padding: 3rem 1.5rem;
     gap: 2.5rem;
   }
-
+ 
   .hero-title {
     font-size: 3.5rem;
   }
-
+ 
   .college-name {
     font-size: 1.1rem;
   }
 }
-
+ 
 @media (max-width: 540px) {
   .header-inner {
     padding: 0.8rem 1rem;
   }
-
+ 
   .header-badge {
     display: none;
   }
-
+ 
   .signup-card, .success-card {
     padding: 1.8rem 1.3rem;
   }
-
+ 
   .hero-stats {
     gap: 1rem;
   }
-
+ 
   .footer-inner {
     flex-direction: column;
     text-align: center;
