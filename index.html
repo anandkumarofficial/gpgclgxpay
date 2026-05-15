@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GP Gonda – Event Payment Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- Background grid lines decoration -->
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="college-logo">
+        <div class="logo-icon">GP</div>
+        <div class="logo-text">
+          <span class="college-name">Government Polytechnic Gonda</span>
+          <span class="college-sub">Event Payment Tracker</span>
+        </div>
+      </div>
+      <div class="header-badge">Student Portal</div>
+    </div>
+  </header>
+
+  <!-- ===== HERO SECTION ===== -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-tag">Welcome</div>
+      <h1 class="hero-title">
+        Track Your<br/>
+        <span class="hero-accent">Event Payments</span>
+      </h1>
+      <p class="hero-desc">
+        One simple place for all students of GP Gonda to manage and track payments for college events and project equipment.
+      </p>
+      <div class="hero-stats">
+        <div class="hstat">
+          <span class="hstat-num">200+</span>
+          <span class="hstat-label">Students</span>
+        </div>
+        <div class="hstat-divider"></div>
+        <div class="hstat">
+          <span class="hstat-num">Fast</span>
+          <span class="hstat-label">Tracking</span>
+        </div>
+        <div class="hstat-divider"></div>
+        <div class="hstat">
+          <span class="hstat-num">Free</span>
+          <span class="hstat-label">Always</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-card-wrap">
+      <!-- ===== SIGNUP CARD ===== -->
+      <div class="signup-card" id="signupCard">
+        <div class="card-header">
+          <div class="card-step">Step 1 of 1</div>
+          <h2 class="card-title">Create Your Account</h2>
+          <p class="card-subtitle">Fill in your details to get started</p>
+        </div>
+
+        <form id="signupForm" novalidate>
+
+          <!-- Name Field -->
+          <div class="field-group" id="fg-name">
+            <label class="field-label" for="studentName">
+              <span class="label-icon">&#9670;</span> Full Name
+            </label>
+            <div class="input-wrap">
+              <input
+                type="text"
+                id="studentName"
+                name="studentName"
+                placeholder="e.g. Rahul Kumar"
+                autocomplete="name"
+              />
+              <span class="input-line"></span>
+            </div>
+            <span class="field-error" id="err-name"></span>
+          </div>
+
+          <!-- Branch Field -->
+          <div class="field-group" id="fg-branch">
+            <label class="field-label" for="studentBranch">
+              <span class="label-icon">&#9670;</span> Branch / Department
+            </label>
+            <div class="input-wrap select-wrap">
+              <select id="studentBranch" name="studentBranch">
+                <option value="" disabled selected>Select your branch</option>
+                <option value="Civil Engineering">Civil Engineering</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Electrical Engineering">Electrical Engineering</option>
+                <option value="Electronics Engineering">Electronics Engineering</option>
+                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Other">Other</option>
+              </select>
+              <span class="input-line"></span>
+              <span class="select-arrow">&#9660;</span>
+            </div>
+            <span class="field-error" id="err-branch"></span>
+          </div>
+
+          <!-- Enrollment No Field -->
+          <div class="field-group" id="fg-enroll">
+            <label class="field-label" for="enrollNo">
+              <span class="label-icon">&#9670;</span> Enrollment Number
+            </label>
+            <div class="input-wrap">
+              <input
+                type="text"
+                id="enrollNo"
+                name="enrollNo"
+                placeholder="e.g. 2200012345"
+                autocomplete="off"
+                style="font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em;"
+              />
+              <span class="input-line"></span>
+            </div>
+            <span class="field-error" id="err-enroll"></span>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <span class="btn-text">Register Now</span>
+            <span class="btn-arrow">&#8594;</span>
+            <span class="btn-loader" style="display:none;">&#9679;&#9679;&#9679;</span>
+          </button>
+
+        </form>
+
+        <p class="login-link">
+          Already registered? <a href="#" id="goLogin">Sign In here</a>
+        </p>
+      </div>
+
+      <!-- ===== SUCCESS CARD (hidden initially) ===== -->
+      <div class="success-card" id="successCard" style="display:none;">
+        <div class="success-icon">&#10003;</div>
+        <h2 class="success-title">Registration Successful!</h2>
+        <p class="success-msg">Welcome to GP Gonda Payment Tracker</p>
+        <div class="success-details" id="successDetails"></div>
+        <button class="submit-btn" onclick="goToDashboard()">
+          <span class="btn-text">Go to Dashboard</span>
+          <span class="btn-arrow">&#8594;</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FEATURES SECTION ===== -->
+  <section class="features-section">
+    <div class="section-label">Why use this?</div>
+    <h2 class="section-title">Everything you need</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feat-icon">&#128275;</div>
+        <h3>Easy Signup</h3>
+        <p>Register in seconds with just your name, branch, and enrollment number.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">&#128200;</div>
+        <h3>Live Tracking</h3>
+        <p>See real-time payment status for all students in your batch.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">&#128276;</div>
+        <h3>Reminders</h3>
+        <p>Auto-generate reminder messages for students who haven't paid yet.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">&#128203;</div>
+        <h3>History Log</h3>
+        <p>Full record of every payment — who paid, when, and how much.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-college">Government Polytechnic Gonda</span>
+      <span class="footer-copy">&copy; 2025 · All rights reserved</span>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
