@@ -143,70 +143,179 @@
   <div class="modal-overlay" id="eventModalOverlay" aria-hidden="true">
     <div class="modal-box" id="eventModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
 
-      <div class="modal-header">
-        <div>
-          <div class="modal-tag">&#43; New Event</div>
-          <h3 class="modal-title" id="modalTitle">Create Event</h3>
-          <p class="modal-subtitle">Fill every field — Save button enables automatically</p>
-        </div>
-        <button class="modal-close" id="closeEventModal" aria-label="Close modal">&#10005;</button>
+      <!-- STEP INDICATOR -->
+      <div class="modal-steps">
+        <div class="modal-step active" id="stepDot1"><span>1</span><small>Event Details</small></div>
+        <div class="modal-step-line"></div>
+        <div class="modal-step" id="stepDot2"><span>2</span><small>Payment Method</small></div>
       </div>
 
+      <!-- ── STEP 1: EVENT DETAILS ── -->
+      <div id="modalStep1">
+        <div class="modal-header">
+          <div>
+            <div class="modal-tag">Step 1 of 2</div>
+            <h3 class="modal-title" id="modalTitle">Event Details</h3>
+            <p class="modal-subtitle">Fill every field to proceed to payment setup</p>
+          </div>
+          <button class="modal-close" id="closeEventModal" aria-label="Close modal">&#10005;</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="field-group" id="mfg-ename">
+            <label class="field-label" for="evtName"><span class="label-icon">&#9670;</span> Event Name</label>
+            <div class="input-wrap"><input type="text" id="evtName" placeholder="e.g. Annual Tech Fest 2025" maxlength="80" /></div>
+            <span class="field-error" id="merr-ename"></span>
+          </div>
+
+          <div class="field-group" id="mfg-reason">
+            <label class="field-label" for="evtReason"><span class="label-icon">&#9670;</span> Reason for Collection</label>
+            <div class="input-wrap"><input type="text" id="evtReason" placeholder="e.g. Equipment purchase, decoration, prizes…" maxlength="120" /></div>
+            <span class="field-error" id="merr-reason"></span>
+          </div>
+
+          <div class="field-group" id="mfg-desc">
+            <label class="field-label" for="evtDesc"><span class="label-icon">&#9670;</span> Description</label>
+            <div class="input-wrap"><textarea id="evtDesc" rows="3" placeholder="Write a short description about the event…" maxlength="400"></textarea></div>
+            <span class="field-error" id="merr-desc"></span>
+          </div>
+
+          <div class="field-group" id="mfg-amount">
+            <label class="field-label" for="evtAmount"><span class="label-icon">&#9670;</span> Amount Needed <span style="color:var(--text-muted);font-size:0.7rem;">(&#8377; per student)</span></label>
+            <div class="input-wrap amount-wrap">
+              <span class="amount-prefix">&#8377;</span>
+              <input type="number" id="evtAmount" placeholder="e.g. 150" min="1" max="99999" style="padding-left:2.2rem;" />
+            </div>
+            <span class="field-error" id="merr-amount"></span>
+          </div>
+
+          <div class="field-group" id="mfg-date">
+            <label class="field-label" for="evtDate"><span class="label-icon">&#9670;</span> Last Date for Payment</label>
+            <div class="input-wrap"><input type="date" id="evtDate" /></div>
+            <span class="field-error" id="merr-date"></span>
+          </div>
+
+          <!-- Step 1 button → goes to Step 2 -->
+          <button class="submit-btn save-evt-btn" id="goToPaymentBtn" disabled>
+            <span id="goPayText">Fill all fields to continue</span>
+            <span id="goPayArrow" style="display:none;">&#8594; Add Payment Method</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── STEP 2: PAYMENT METHOD ── -->
+      <div id="modalStep2" style="display:none;">
+        <div class="modal-header">
+          <div>
+            <div class="modal-tag">Step 2 of 2</div>
+            <h3 class="modal-title">Payment Method</h3>
+            <p class="modal-subtitle">Students will use these details to pay you</p>
+          </div>
+          <button class="modal-close" id="closeEventModal2" aria-label="Close modal">&#10005;</button>
+        </div>
+
+        <div class="modal-body">
+
+          <!-- Back button -->
+          <button class="back-btn" id="backToStep1">&#8592; Back to Event Details</button>
+
+          <!-- Mobile Number — Important -->
+          <div class="field-group" id="mfg-mobile">
+            <label class="field-label" for="payMobile">
+              <span class="label-icon">&#9670;</span> Mobile Number for Payment
+              <span class="field-required">&#9733; Important</span>
+            </label>
+            <div class="input-wrap">
+              <input type="tel" id="payMobile" placeholder="e.g. 9876543210" maxlength="10" />
+            </div>
+            <span class="field-error" id="merr-mobile"></span>
+            <span class="field-hint">Students will send payment to this number via PhonePe / GPay / Paytm</span>
+          </div>
+
+          <!-- UPI ID — Optional -->
+          <div class="field-group" id="mfg-upi">
+            <label class="field-label" for="payUpi">
+              <span class="label-icon">&#9670;</span> UPI ID
+              <span class="field-optional">Optional</span>
+            </label>
+            <div class="input-wrap">
+              <input type="text" id="payUpi" placeholder="e.g. anandkumar@upi" maxlength="60" />
+            </div>
+            <span class="field-error" id="merr-upi"></span>
+            <span class="field-hint">Example: yourname@okicici, yourname@ybl, yourname@paytm</span>
+          </div>
+
+          <!-- QR Code Upload — Important -->
+          <div class="field-group" id="mfg-qr">
+            <label class="field-label" for="payQr">
+              <span class="label-icon">&#9670;</span> Upload QR Code
+              <span class="field-required">&#9733; Important</span>
+            </label>
+            <div class="qr-upload-box" id="qrUploadBox">
+              <input type="file" id="payQr" accept="image/*" style="display:none;" />
+              <div class="qr-upload-inner" id="qrUploadInner" onclick="document.getElementById('payQr').click()">
+                <div class="qr-upload-icon">&#128247;</div>
+                <div class="qr-upload-text">Click to upload your QR code</div>
+                <div class="qr-upload-sub">PNG, JPG supported</div>
+              </div>
+              <img id="qrPreview" src="" alt="QR Preview" style="display:none;" />
+            </div>
+            <span class="field-error" id="merr-qr"></span>
+            <span class="field-hint">Students will scan this QR code to pay directly</span>
+          </div>
+
+          <!-- Final Save Button -->
+          <button class="submit-btn save-evt-btn" id="saveEventBtn">
+            <span id="saveEvtText">&#10003; Save Event &amp; Payment Details</span>
+            <span id="saveEvtLoader" style="display:none; letter-spacing:4px; font-size:0.75rem;">&#9679;&#9679;&#9679;</span>
+          </button>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== PAYMENT INFO POPUP (for students) ===== -->
+  <div class="modal-overlay" id="paymentPopupOverlay" aria-hidden="true">
+    <div class="modal-box payment-popup" id="paymentPopup" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div>
+          <div class="modal-tag">&#128179; Pay Now</div>
+          <h3 class="modal-title" id="ppEventName">Event Name</h3>
+          <p class="modal-subtitle">Scan QR or use the details below to pay</p>
+        </div>
+        <button class="modal-close" id="ppClose" aria-label="Close">&#10005;</button>
+      </div>
       <div class="modal-body">
 
-        <!-- Event Name -->
-        <div class="field-group" id="mfg-ename">
-          <label class="field-label" for="evtName"><span class="label-icon">&#9670;</span> Event Name</label>
-          <div class="input-wrap">
-            <input type="text" id="evtName" placeholder="e.g. Annual Tech Fest 2025" maxlength="80" />
-          </div>
-          <span class="field-error" id="merr-ename"></span>
-        </div>
-
-        <!-- Reason -->
-        <div class="field-group" id="mfg-reason">
-          <label class="field-label" for="evtReason"><span class="label-icon">&#9670;</span> Reason for Collection</label>
-          <div class="input-wrap">
-            <input type="text" id="evtReason" placeholder="e.g. Equipment purchase, decoration, prizes…" maxlength="120" />
-          </div>
-          <span class="field-error" id="merr-reason"></span>
-        </div>
-
-        <!-- Description -->
-        <div class="field-group" id="mfg-desc">
-          <label class="field-label" for="evtDesc"><span class="label-icon">&#9670;</span> Description</label>
-          <div class="input-wrap">
-            <textarea id="evtDesc" rows="3" placeholder="Write a short description about the event…" maxlength="400"></textarea>
-          </div>
-          <span class="field-error" id="merr-desc"></span>
-        </div>
-
         <!-- Amount -->
-        <div class="field-group" id="mfg-amount">
-          <label class="field-label" for="evtAmount"><span class="label-icon">&#9670;</span> Amount Needed <span style="color:var(--text-muted);font-size:0.7rem;">(&#8377; per student)</span></label>
-          <div class="input-wrap amount-wrap">
-            <span class="amount-prefix">&#8377;</span>
-            <input type="number" id="evtAmount" placeholder="e.g. 150" min="1" max="99999" style="padding-left:2.2rem;" />
-          </div>
-          <span class="field-error" id="merr-amount"></span>
+        <div class="pp-amount-box">
+          <span class="pp-amount-label">Amount to Pay</span>
+          <span class="pp-amount-val">&#8377;<span id="ppAmount">0</span></span>
         </div>
 
-        <!-- Last Date -->
-        <div class="field-group" id="mfg-date">
-          <label class="field-label" for="evtDate"><span class="label-icon">&#9670;</span> Last Date for Payment</label>
-          <div class="input-wrap">
-            <input type="date" id="evtDate" />
-          </div>
-          <span class="field-error" id="merr-date"></span>
+        <!-- QR Code -->
+        <div class="pp-qr-wrap">
+          <img id="ppQrImg" src="" alt="Payment QR Code" />
+          <p class="pp-qr-hint">&#128247; Scan with PhonePe / GPay / Paytm</p>
         </div>
 
-        <!-- Save Button — disabled until all fields filled -->
-        <button class="submit-btn save-evt-btn" id="saveEventBtn" disabled>
-          <span id="saveEvtText">Fill all fields to enable Save</span>
-          <span id="saveEvtArrow" style="display:none;">&#8594;</span>
-          <span id="saveEvtLoader" style="display:none; letter-spacing:4px; font-size:0.75rem;">&#9679;&#9679;&#9679;</span>
-        </button>
+        <!-- Details -->
+        <div class="pp-details">
+          <div class="pp-detail-row">
+            <span class="pp-detail-label">&#128241; Mobile (UPI Pay)</span>
+            <span class="pp-detail-val" id="ppMobile">—</span>
+          </div>
+          <div class="pp-detail-row">
+            <span class="pp-detail-label">&#128279; UPI ID</span>
+            <span class="pp-detail-val" id="ppUpi">—</span>
+          </div>
+        </div>
 
+        <div class="pp-note">
+          &#9888;&#65039; After payment, inform your class admin with your name and screenshot.
+        </div>
       </div>
     </div>
   </div>
