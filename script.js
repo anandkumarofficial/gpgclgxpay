@@ -287,14 +287,15 @@ document.addEventListener('DOMContentLoaded', function () {
     try{ currentUser=JSON.parse(localStorage.getItem('gpg_current_user')); } catch(e){}
 
     var newEvent = {
-      id:          Date.now(),
-      name:        evtName.value.trim(),
-      reason:      evtReason.value.trim(),
-      description: evtDesc.value.trim(),
-      amount:      parseFloat(evtAmount.value),
-      lastDate:    evtDate.value,
-      createdBy:   currentUser ? currentUser.name : 'Anonymous',
-      createdAt:   new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric'}),
+      id:           Date.now(),
+      name:         evtName.value.trim(),
+      reason:       evtReason.value.trim(),
+      description:  evtDesc.value.trim(),
+      amount:       parseFloat(evtAmount.value),
+      lastDate:     evtDate.value,
+      createdBy:    currentUser ? currentUser.name       : 'Anonymous',
+      createdByEnr: currentUser ? currentUser.enrollment : '',
+      createdAt:    new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric'}),
       payment: {
         mobile: payMobile ? payMobile.value.trim() : '',
         upi:    payUpi    ? payUpi.value.trim()    : '',
@@ -309,6 +310,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if(err2){ alert('Could not save event. Try again.'); resetSaveBtn(); return; }
         resetFullForm();
         closeModal();
+        showToast('Event Successfully Created!', 'success');
         renderEvents();
       });
     });
@@ -404,7 +406,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
       var loggedInUser=null;
       try{ loggedInUser=JSON.parse(localStorage.getItem('gpg_current_user')); } catch(e){}
-      var loggedInName=loggedInUser ? loggedInUser.name.trim().toLowerCase() : '';
+      var loggedInName = loggedInUser ? loggedInUser.name.trim().toLowerCase()       : '';
+      var loggedInEnr  = loggedInUser ? (loggedInUser.enrollment||'').trim().toUpperCase() : '';
 
       events.forEach(function(ev, idx){
         var today    = new Date(new Date().toDateString());
@@ -417,15 +420,23 @@ document.addEventListener('DOMContentLoaded', function () {
           ? '<span class="event-meta-val date-warning">Expired</span>'
           : '<span class="event-meta-val'+(daysLeft<=3?' date-warning':'')+'">'+dateStr+(daysLeft<=3?' ('+daysLeft+' days left!)':'')+'</span>';
 
-        var isCreator = loggedInName && ev.createdBy && (ev.createdBy.trim().toLowerCase()===loggedInName);
+        // Match by enrollment number first (most reliable), fallback to name
+        var isCreator = false;
+        if(loggedInEnr && ev.createdByEnr) {
+          isCreator = (ev.createdByEnr.trim().toUpperCase() === loggedInEnr);
+        } else if(loggedInName && ev.createdBy) {
+          isCreator = (ev.createdBy.trim().toLowerCase() === loggedInName);
+        }
+
         var deleteBtn = isCreator
           ? '<button class="event-delete-btn" data-id="'+ev.id+'">&#128465; Delete</button>'
           : '<span class="event-creator-only">Only creator can delete</span>';
 
-        // Pay Now button — shown to non-creators (students)
-        var payBtn = !isCreator && ev.payment
+        // Pay Now — show to everyone EXCEPT the creator
+        var hasPayment = ev.payment && (ev.payment.mobile || ev.payment.qr || ev.payment.upi);
+        var payBtn = (!isCreator && hasPayment)
           ? '<button class="event-pay-btn" data-id="'+ev.id+'">&#128179; Pay Now</button>'
-          : '';
+          : (!isCreator ? '<span class="event-creator-only">Payment info not added</span>' : '');
 
         var card=document.createElement('div');
         card.className='event-card';
@@ -500,6 +511,28 @@ document.addEventListener('DOMContentLoaded', function () {
   function shakeCard(id) {
     var c=document.getElementById(id); if(!c) return;
     [-8,8,-6,6,-4,4,0].forEach(function(m,i){ setTimeout(function(){ c.style.transform='translateX('+m+'px)'; },i*60); });
+  }
+
+  // ── Toast notification ─────────────────────
+  function showToast(message, type) {
+    // Remove any existing toast
+    var old = document.getElementById('gpgToast');
+    if(old) old.remove();
+
+    var toast = document.createElement('div');
+    toast.id = 'gpgToast';
+    toast.className = 'gpg-toast gpg-toast-' + (type||'success');
+    toast.innerHTML = message;
+    document.body.appendChild(toast);
+
+    // Animate in
+    setTimeout(function(){ toast.classList.add('gpg-toast-show'); }, 10);
+
+    // Remove after 2.5 seconds
+    setTimeout(function(){
+      toast.classList.remove('gpg-toast-show');
+      setTimeout(function(){ if(toast.parentNode) toast.remove(); }, 400);
+    }, 2500);
   }
 });
 
