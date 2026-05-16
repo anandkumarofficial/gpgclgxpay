@@ -851,6 +851,14 @@ body {
   background: rgba(255,78,78,0.1);
 }
 
+.event-creator-only {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+  font-style: italic;
+}
+
 /* =============================================
    MODAL
    ============================================= */
