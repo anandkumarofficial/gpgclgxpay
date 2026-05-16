@@ -1016,10 +1016,373 @@ input[type="date"] {
 .modal-box::-webkit-scrollbar-track { background: var(--bg-card); }
 .modal-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
 
+/* =============================================
+   MODAL STEP INDICATOR
+   ============================================= */
+.modal-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 1.2rem 2rem 0;
+}
+
+.modal-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.modal-step span {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-input);
+  border: 2px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.modal-step small {
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+
+.modal-step.active span {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+  font-weight: 700;
+}
+
+.modal-step.active small {
+  color: var(--accent);
+}
+
+.modal-step.done span {
+  background: var(--success);
+  border-color: var(--success);
+  color: #000;
+}
+
+.modal-step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  min-width: 60px;
+  margin: 0 8px;
+  margin-bottom: 20px;
+  transition: background 0.3s;
+}
+
+.modal-step-line.active { background: var(--accent); }
+
+/* =============================================
+   PAYMENT METHOD STEP
+   ============================================= */
+.field-required {
+  margin-left: auto;
+  font-size: 0.65rem;
+  color: var(--accent);
+  letter-spacing: 1px;
+  font-family: var(--font-mono);
+  background: var(--accent-dim);
+  padding: 2px 7px;
+  border-radius: 99px;
+}
+
+.field-optional {
+  margin-left: auto;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  font-family: var(--font-mono);
+  border: 1px solid var(--border);
+  padding: 2px 7px;
+  border-radius: 99px;
+}
+
+.field-hint {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 5px;
+  font-family: var(--font-mono);
+  line-height: 1.5;
+}
+
+/* QR Upload Box */
+.qr-upload-box {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color 0.2s;
+  cursor: pointer;
+}
+
+.qr-upload-box:hover { border-color: var(--accent); }
+.qr-upload-box.has-image { border-style: solid; border-color: var(--success); }
+
+.qr-upload-inner {
+  padding: 2rem 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.qr-upload-icon { font-size: 2rem; opacity: 0.6; }
+
+.qr-upload-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.qr-upload-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+#qrPreview {
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  padding: 0.5rem;
+  background: #fff;
+}
+
+/* Back button */
+.back-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.back-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Event card payment section */
+.event-pay-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.event-pay-title {
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-bottom: 0.7rem;
+}
+
+.event-pay-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.event-pay-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.event-pay-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  min-width: 55px;
+  font-family: var(--font-mono);
+}
+
+.event-pay-val {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.event-qr-img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  margin-top: 0.5rem;
+  border: 1px solid var(--border);
+  padding: 4px;
+}
+
+/* Max events warning */
+.max-events-warning {
+  background: rgba(255,78,78,0.08);
+  border: 1px solid rgba(255,78,78,0.3);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.2rem;
+  color: var(--danger);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.max-events-warning strong { display: block; font-size: 1rem; margin-bottom: 0.3rem; }
+
 @media (max-width: 600px) {
   .ce-inner { flex-direction: column; align-items: flex-start; }
   .create-event-btn { width: 100%; justify-content: center; }
   .modal-header { padding: 1.5rem 1.3rem 0; }
   .modal-body { padding: 1.2rem 1.3rem 1.5rem; }
   .events-grid { grid-template-columns: 1fr; }
+  .modal-steps { padding: 1rem 1rem 0; }
+  .modal-step-line { min-width: 30px; }
+}
+
+/* =============================================
+   PAY NOW BUTTON on event card
+   ============================================= */
+.event-pay-btn {
+  background: var(--accent);
+  border: none;
+  color: #000;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  padding: 5px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+}
+.event-pay-btn:hover {
+  background: #ffc233;
+  transform: translateY(-2px);
+}
+
+/* =============================================
+   PAYMENT POPUP (for students)
+   ============================================= */
+.payment-popup {
+  max-width: 420px;
+}
+
+.pp-amount-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.5rem;
+}
+.pp-amount-label {
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+.pp-amount-val {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--accent);
+  letter-spacing: 2px;
+}
+
+.pp-qr-wrap {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.pp-qr-wrap img {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  border: 3px solid var(--border);
+  border-radius: var(--radius-md);
+  background: #fff;
+  padding: 8px;
+  display: block;
+  margin: 0 auto 0.6rem;
+}
+.pp-qr-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+}
+
+.pp-details {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.8rem 1rem;
+  margin-bottom: 1.2rem;
+}
+.pp-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.88rem;
+}
+.pp-detail-row:last-child { border-bottom: none; }
+.pp-detail-label {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+}
+.pp-detail-val {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.pp-note {
+  background: rgba(240,165,0,0.06);
+  border: 1px solid rgba(240,165,0,0.2);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* =============================================
+   MAX EVENTS WARNING (shown on Create btn)
+   ============================================= */
+.max-events-badge {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--danger);
+  background: rgba(255,78,78,0.1);
+  border: 1px solid rgba(255,78,78,0.3);
+  border-radius: 99px;
+  padding: 2px 10px;
+  margin-left: 10px;
+  letter-spacing: 1px;
 }
