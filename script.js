@@ -1,541 +1,428 @@
 // =============================================
-//  GP GONDA – EVENT PAYMENT TRACKER
-//  script.js  —  v3  (2-event limit + payment)
+//  GP GONDA v2 — script.js
+//  Register / Login / Forgot Password
 // =============================================
 
+// ── JSONBin Config ─────────────────────────
 var BIN_ID  = '6a07f6fac0954111d82ee279';
 var API_KEY = '$2a$10$ntQbtOWUeUX0nQqmVNx5/.SmTfpLHr4.X4I2ILQ7aTEtD5/NhMybW';
 var BIN_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
 
-// ── READ from JSONBin ──────────────────────
-function fetchEvents(callback) {
-  fetch(BIN_URL + '/latest', { headers: { 'X-Access-Key': API_KEY } })
+// ── JSONBin: Read users ────────────────────
+function fetchUsers(cb) {
+  fetch(BIN_URL + '/latest', { headers:{'X-Access-Key':API_KEY} })
   .then(function(r){ return r.json(); })
   .then(function(d){
-    var ev = d.record || [];
-    ev = ev.filter(function(e){ return !e.init; });
-    callback(null, ev);
+    var data = d.record || {};
+    cb(null, data.users || []);
   })
-  .catch(function(e){ callback(e, []); });
+  .catch(function(e){ cb(e,[]); });
 }
 
-// ── WRITE to JSONBin ───────────────────────
-function saveEvents(events, callback) {
-  fetch(BIN_URL, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'X-Access-Key': API_KEY },
-    body: JSON.stringify(events)
+// ── JSONBin: Write users ───────────────────
+function saveUsers(users, cb) {
+  // First fetch full record so we don't overwrite events
+  fetch(BIN_URL + '/latest', { headers:{'X-Access-Key':API_KEY} })
+  .then(function(r){ return r.json(); })
+  .then(function(d){
+    var record = d.record || {};
+    record.users = users;
+    return fetch(BIN_URL, {
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Access-Key':API_KEY},
+      body:JSON.stringify(record)
+    });
   })
   .then(function(r){ return r.json(); })
-  .then(function(){ if(callback) callback(null); })
-  .catch(function(e){ if(callback) callback(e); });
+  .then(function(){ if(cb) cb(null); })
+  .catch(function(e){ if(cb) cb(e); });
 }
 
-// ── Escape HTML ────────────────────────────
-function esc(str) {
-  var d = document.createElement('div');
-  d.appendChild(document.createTextNode(String(str)));
+// ── Simple hash (not cryptographic — basic obfuscation) ──
+function hashPass(str) {
+  var hash = 0;
+  for(var i=0;i<str.length;i++){
+    hash = ((hash<<5)-hash)+str.charCodeAt(i);
+    hash |= 0;
+  }
+  return 'h' + Math.abs(hash).toString(36) + str.length;
+}
+
+// ── Escape HTML ─────────────────────────────
+function esc(s){
+  var d=document.createElement('div');
+  d.appendChild(document.createTextNode(String(s)));
   return d.innerHTML;
 }
 
-// =============================================
-document.addEventListener('DOMContentLoaded', function () {
+// ── Toast ─────────────────────────────────
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type==='error'?' error':'');
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
 
-  // Logo fallback
-  var logoImg = document.getElementById('logoImg');
-  if (logoImg) {
-    logoImg.onerror = function () {
-      this.style.display = 'none';
-      var fb = document.getElementById('logoFallback');
-      if (fb) fb.style.display = 'flex';
-    };
-  }
+// ──────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
 
-  // =============================================
-  //  SIGNUP FORM
-  // =============================================
-  function validateName(v)   { v=v.trim(); if(!v) return 'Name is required'; if(v.length<3) return 'At least 3 characters'; if(!/^[a-zA-Z\s]+$/.test(v)) return 'Letters only'; return ''; }
-  function validateBranch(v) { return v ? '' : 'Please select your branch'; }
-  function validateEnroll(v) {
-    v=v.trim();
-    if(!v)            return 'Enrollment number is required';
-    if(v.length<15)   return 'Too short — exactly 15 characters (e.g. E23220932900034)';
-    if(v.length>15)   return 'Too long — exactly 15 characters (e.g. E23220932900034)';
-    if(!/^[A-Z]\d{14}$/.test(v)) return '1 letter + 14 digits (e.g. E23220932900034)';
-    return '';
-  }
+  // ── Tab switch ──────────────────────────
+  window.switchTab = function(tab) {
+    var slider = document.getElementById('tabSlider');
+    var regCard = document.getElementById('registerCard');
+    var logCard = document.getElementById('loginCard');
+    var tabReg  = document.getElementById('tabRegister');
+    var tabLog  = document.getElementById('tabLogin');
 
-  function setField(inputId, errId, msg) {
-    var inp=document.getElementById(inputId), err=document.getElementById(errId);
-    if(!inp||!err) return;
-    err.textContent=msg;
-    if(msg){ inp.classList.add('error'); inp.classList.remove('valid'); }
-    else   { inp.classList.remove('error'); inp.classList.add('valid'); }
-  }
-
-  var nameEl=document.getElementById('studentName'), branchEl=document.getElementById('studentBranch'), enrollEl=document.getElementById('enrollNo');
-  if(nameEl)   nameEl.addEventListener('input',   function(){ setField('studentName','err-name',validateName(this.value)); });
-  if(branchEl) branchEl.addEventListener('change',function(){ setField('studentBranch','err-branch',validateBranch(this.value)); });
-  if(enrollEl) enrollEl.addEventListener('input',  function(){
-    var pos=this.selectionStart; this.value=this.value.toUpperCase(); this.setSelectionRange(pos,pos);
-    setField('enrollNo','err-enroll',validateEnroll(this.value));
-  });
-
-  var signupForm=document.getElementById('signupForm');
-  if(signupForm) {
-    signupForm.addEventListener('submit', function(e){
-      e.preventDefault();
-      var ne=validateName(nameEl.value), be=validateBranch(branchEl.value), ee=validateEnroll(enrollEl.value);
-      setField('studentName','err-name',ne); setField('studentBranch','err-branch',be); setField('enrollNo','err-enroll',ee);
-      if(ne||be||ee){ shakeCard('signupCard'); return; }
-
-      var btn=document.getElementById('submitBtn');
-      btn.disabled=true;
-      document.getElementById('btnText').style.display='none';
-      document.getElementById('btnArrow').style.display='none';
-      document.getElementById('btnLoader').style.display='inline';
-
-      var data={ name:nameEl.value.trim(), branch:branchEl.value, enrollment:enrollEl.value.trim().toUpperCase(),
-        registeredAt:new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}), paid:false };
-
-      try {
-        var students=JSON.parse(localStorage.getItem('gpg_students')||'[]');
-        if(!students.find(function(s){ return s.enrollment===data.enrollment; })) students.push(data);
-        localStorage.setItem('gpg_students',JSON.stringify(students));
-        localStorage.setItem('gpg_current_user',JSON.stringify(data));
-      } catch(ex){}
-
-      document.getElementById('successDetails').innerHTML=
-        detailRow('Name',data.name)+detailRow('Branch',data.branch)+
-        detailRow('Enrollment',data.enrollment)+detailRow('Registered',data.registeredAt);
-      swapCards('signupCard','successCard');
-    });
-  }
-
-  var goLogin=document.getElementById('goLogin');
-  if(goLogin) goLogin.addEventListener('click',function(e){ e.preventDefault(); alert('Login page coming soon!'); });
-
-  // =============================================
-  //  CREATE EVENT MODAL — 2 STEPS
-  // =============================================
-  var overlay  = document.getElementById('eventModalOverlay');
-  var openBtn  = document.getElementById('openEventModal');
-  var closeBtn = document.getElementById('closeEventModal');
-  var closeBtn2= document.getElementById('closeEventModal2');
-
-  // Step 1 inputs
-  var evtName   = document.getElementById('evtName');
-  var evtReason = document.getElementById('evtReason');
-  var evtDesc   = document.getElementById('evtDesc');
-  var evtAmount = document.getElementById('evtAmount');
-  var evtDate   = document.getElementById('evtDate');
-
-  // Step 2 inputs
-  var payMobile = document.getElementById('payMobile');
-  var payUpi    = document.getElementById('payUpi');
-  var payQr     = document.getElementById('payQr');
-
-  // Buttons
-  var goPayBtn  = document.getElementById('goToPaymentBtn');
-  var saveBtn   = document.getElementById('saveEventBtn');
-  var backBtn   = document.getElementById('backToStep1');
-
-  // Step dots
-  var stepDot1 = document.getElementById('stepDot1');
-  var stepDot2 = document.getElementById('stepDot2');
-
-  if(evtDate) evtDate.min = new Date().toISOString().split('T')[0];
-
-  // Store QR as base64
-  var qrBase64 = '';
-
-  function openModal() {
-    overlay.classList.add('open');
-    document.body.style.overflow='hidden';
-    showStep(1);
-    if(evtName) evtName.focus();
-  }
-  function closeModal() {
-    overlay.classList.remove('open');
-    document.body.style.overflow='';
-  }
-  function showStep(n) {
-    document.getElementById('modalStep1').style.display = n===1 ? 'block' : 'none';
-    document.getElementById('modalStep2').style.display = n===2 ? 'block' : 'none';
-    if(stepDot1) stepDot1.classList.toggle('active', n===1);
-    if(stepDot2) stepDot2.classList.toggle('active', n===2);
-  }
-
-  if(openBtn) openBtn.addEventListener('click', function() {
-    // ── CHANGE 1: Max 2 events per person ──
-    var currentUser = null;
-    try{ currentUser=JSON.parse(localStorage.getItem('gpg_current_user')); } catch(e){}
-    if(!currentUser){ alert('Please register/login first before creating an event!'); return; }
-
-    var myName = currentUser.name.trim().toLowerCase();
-
-    fetchEvents(function(err, allEvents){
-      if(err){ openModal(); return; } // if fetch fails, just open anyway
-
-      var myEvents = allEvents.filter(function(ev){
-        return ev.createdBy && ev.createdBy.trim().toLowerCase() === myName;
-      });
-
-      if(myEvents.length >= 2){
-        alert('You already have 2 active events!\n\nPlease delete at least 1 of your existing events before creating a new one.');
-        return;
-      }
-      openModal();
-    });
-  });
-
-  if(closeBtn)  closeBtn.addEventListener('click',  closeModal);
-  if(closeBtn2) closeBtn2.addEventListener('click', closeModal);
-  if(overlay)   overlay.addEventListener('click', function(e){ if(e.target===overlay) closeModal(); });
-  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
-
-  // ── Step 1 Validation ──────────────────────
-  function vName(v)   { v=v.trim(); if(!v) return 'Event name is required'; if(v.length<3) return 'At least 3 characters'; return ''; }
-  function vReason(v) { v=v.trim(); if(!v) return 'Reason is required'; if(v.length<5) return 'Please be more specific'; return ''; }
-  function vDesc(v)   { v=v.trim(); if(!v) return 'Description is required'; if(v.length<10) return 'At least 10 characters'; return ''; }
-  function vAmount(v) { var n=parseFloat(v); if(!v||isNaN(n)) return 'Amount is required'; if(n<1) return 'At least Rs 1'; return ''; }
-  function vDate(v)   { if(!v) return 'Last date is required'; if(new Date(v)<new Date(new Date().toDateString())) return 'Cannot be in the past'; return ''; }
-
-  function setMF(inputId, errId, msg) {
-    var inp=document.getElementById(inputId), err=document.getElementById(errId);
-    if(!inp||!err) return;
-    err.textContent=msg;
-    if(msg){ inp.classList.add('error'); inp.classList.remove('valid'); }
-    else   { inp.classList.remove('error'); inp.classList.add('valid'); }
-  }
-
-  function checkStep1() {
-    var ok = !vName(evtName.value)&&!vReason(evtReason.value)&&!vDesc(evtDesc.value)&&!vAmount(evtAmount.value)&&!vDate(evtDate.value);
-    goPayBtn.disabled = !ok;
-    document.getElementById('goPayText').style.display  = ok ? 'none'   : 'inline';
-    document.getElementById('goPayArrow').style.display = ok ? 'inline' : 'none';
-  }
-
-  if(evtName)   evtName.addEventListener('input',   function(){ setMF('evtName','merr-ename',vName(this.value));     checkStep1(); });
-  if(evtReason) evtReason.addEventListener('input',  function(){ setMF('evtReason','merr-reason',vReason(this.value)); checkStep1(); });
-  if(evtDesc)   evtDesc.addEventListener('input',    function(){ setMF('evtDesc','merr-desc',vDesc(this.value));       checkStep1(); });
-  if(evtAmount) evtAmount.addEventListener('input',  function(){ setMF('evtAmount','merr-amount',vAmount(this.value)); checkStep1(); });
-  if(evtDate)   evtDate.addEventListener('change',   function(){ setMF('evtDate','merr-date',vDate(this.value));       checkStep1(); });
-
-  // ── Go to Step 2 ───────────────────────────
-  if(goPayBtn) goPayBtn.addEventListener('click', function(){
-    if(vName(evtName.value)||vReason(evtReason.value)||vDesc(evtDesc.value)||vAmount(evtAmount.value)||vDate(evtDate.value)) return;
-    showStep(2);
-    if(payMobile) payMobile.focus();
-  });
-
-  // ── Back to Step 1 ─────────────────────────
-  if(backBtn) backBtn.addEventListener('click', function(){ showStep(1); });
-
-  // ── Step 2: QR Preview ─────────────────────
-  if(payQr) payQr.addEventListener('change', function(){
-    var file=this.files[0];
-    if(!file){ qrBase64=''; return; }
-    if(file.size > 2*1024*1024){ alert('QR image must be smaller than 2MB'); this.value=''; qrBase64=''; return; }
-
-    var reader=new FileReader();
-    reader.onload=function(e){
-      qrBase64=e.target.result;
-      var preview=document.getElementById('qrPreview');
-      var inner=document.getElementById('qrUploadInner');
-      preview.src=qrBase64;
-      preview.style.display='block';
-      inner.style.display='none';
-      document.getElementById('merr-qr').textContent='';
-    };
-    reader.readAsDataURL(file);
-  });
-
-  // ── Step 2 Validation ──────────────────────
-  function vMobile(v) {
-    v=v.trim();
-    if(!v) return 'Mobile number is required';
-    if(!/^[6-9]\d{9}$/.test(v)) return 'Enter a valid 10-digit Indian mobile number';
-    return '';
-  }
-  function vUpi(v) {
-    v=v.trim();
-    if(!v) return ''; // optional
-    if(!/^[\w.\-]{3,}@[\w]{3,}$/.test(v)) return 'Enter valid UPI ID (e.g. name@upi)';
-    return '';
-  }
-
-  // ── Final Save (Step 2) ────────────────────
-  if(saveBtn) saveBtn.addEventListener('click', function(){
-    // Validate step 2
-    var me=vMobile(payMobile?payMobile.value:'');
-    var ue=vUpi(payUpi?payUpi.value:'');
-    var qe=!qrBase64 ? 'QR code is required — please upload your payment QR' : '';
-
-    if(payMobile) setMF('payMobile','merr-mobile',me);
-    if(payUpi)    setMF('payUpi','merr-upi',ue);
-    document.getElementById('merr-qr').textContent=qe;
-
-    if(me||ue||qe){ shakeCard('eventModal'); return; }
-
-    // Show loader
-    saveBtn.disabled=true;
-    document.getElementById('saveEvtText').style.display='none';
-    document.getElementById('saveEvtLoader').style.display='inline';
-
-    var currentUser=null;
-    try{ currentUser=JSON.parse(localStorage.getItem('gpg_current_user')); } catch(e){}
-
-    var newEvent = {
-      id:           Date.now(),
-      name:         evtName.value.trim(),
-      reason:       evtReason.value.trim(),
-      description:  evtDesc.value.trim(),
-      amount:       parseFloat(evtAmount.value),
-      lastDate:     evtDate.value,
-      createdBy:    currentUser ? currentUser.name       : 'Anonymous',
-      createdByEnr: currentUser ? currentUser.enrollment : '',
-      createdAt:    new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric'}),
-      payment: {
-        mobile: payMobile ? payMobile.value.trim() : '',
-        upi:    payUpi    ? payUpi.value.trim()    : '',
-        qr:     qrBase64
-      }
-    };
-
-    fetchEvents(function(err, currentEvents){
-      if(err){ alert('Could not connect. Check internet and try again.'); resetSaveBtn(); return; }
-      currentEvents.unshift(newEvent);
-      saveEvents(currentEvents, function(err2){
-        if(err2){ alert('Could not save event. Try again.'); resetSaveBtn(); return; }
-        resetFullForm();
-        closeModal();
-        showToast('Event Successfully Created!', 'success');
-        renderEvents();
-      });
-    });
-  });
-
-  function resetSaveBtn(){
-    document.getElementById('saveEvtText').style.display='inline';
-    document.getElementById('saveEvtLoader').style.display='none';
-    saveBtn.disabled=false;
-  }
-
-  function resetFullForm(){
-    // Step 1
-    evtName.value=evtReason.value=evtDesc.value=evtAmount.value=evtDate.value='';
-    [evtName,evtReason,evtDesc,evtAmount,evtDate].forEach(function(el){ el.classList.remove('valid','error'); });
-    document.getElementById('goPayText').style.display='inline';
-    document.getElementById('goPayArrow').style.display='none';
-    goPayBtn.disabled=true;
-    // Step 2
-    if(payMobile) payMobile.value='';
-    if(payUpi)    payUpi.value='';
-    if(payQr)     payQr.value='';
-    qrBase64='';
-    var preview=document.getElementById('qrPreview');
-    if(preview){ preview.src=''; preview.style.display='none'; }
-    var inner=document.getElementById('qrUploadInner');
-    if(inner) inner.style.display='flex';
-    document.getElementById('saveEvtText').style.display='inline';
-    document.getElementById('saveEvtLoader').style.display='none';
-    saveBtn.disabled=false;
-    ['merr-mobile','merr-upi','merr-qr'].forEach(function(id){
-      var el=document.getElementById(id); if(el) el.textContent='';
-    });
-  }
-
-  // =============================================
-  //  PAYMENT INFO POPUP (for students viewing)
-  // =============================================
-  var payPopup     = document.getElementById('paymentPopup');
-  var payPopupOver = document.getElementById('paymentPopupOverlay');
-
-  function openPaymentPopup(ev) {
-    if(!payPopup||!ev.payment) return;
-    document.getElementById('ppEventName').textContent = ev.name;
-    document.getElementById('ppAmount').textContent    = ev.amount;
-    document.getElementById('ppMobile').textContent    = ev.payment.mobile || '—';
-    document.getElementById('ppUpi').textContent       = ev.payment.upi    || 'Not provided';
-
-    var qrImg = document.getElementById('ppQrImg');
-    if(ev.payment.qr){
-      qrImg.src=ev.payment.qr; qrImg.style.display='block';
+    if(tab === 'register'){
+      slider.style.left = '5px';
+      tabReg.classList.add('active');
+      tabLog.classList.remove('active');
+      regCard.style.display = 'block';
+      logCard.style.display = 'none';
     } else {
-      qrImg.style.display='none';
+      slider.style.left = 'calc(50%)';
+      tabLog.classList.add('active');
+      tabReg.classList.remove('active');
+      logCard.style.display = 'block';
+      regCard.style.display = 'none';
     }
-    payPopupOver.classList.add('open');
-    document.body.style.overflow='hidden';
+  };
+
+  // ── Password visibility toggle ─────────
+  window.togglePass = function(id, btn) {
+    var inp = document.getElementById(id);
+    if(inp.type === 'password'){
+      inp.type = 'text'; btn.textContent = '🙈';
+    } else {
+      inp.type = 'password'; btn.textContent = '👁';
+    }
+  };
+
+  // ── Field helper ───────────────────────
+  function setF(inputId, errId, msg) {
+    var inp=document.getElementById(inputId);
+    var err=document.getElementById(errId);
+    if(!inp||!err) return;
+    err.textContent = msg;
+    if(msg){ inp.classList.add('err'); inp.classList.remove('ok'); }
+    else   { inp.classList.remove('err'); inp.classList.add('ok'); }
   }
 
-  if(payPopupOver) payPopupOver.addEventListener('click', function(e){
-    if(e.target===payPopupOver){ payPopupOver.classList.remove('open'); document.body.style.overflow=''; }
+  function clearF(inputId, errId){
+    var inp=document.getElementById(inputId);
+    var err=document.getElementById(errId);
+    if(inp){ inp.classList.remove('err','ok'); }
+    if(err){ err.textContent=''; }
+  }
+
+  // ─────────────────────────────────────────
+  //  REGISTER
+  // ─────────────────────────────────────────
+  var FIELDS_TOTAL = 9;
+  var fieldIds = ['rName','rBranch','rEnroll','rPhone','rPass','rQ1','rQ2','rQ3'];
+
+  function updateProgress(){
+    var filled = 0;
+    if(document.getElementById('rName').value.trim())   filled++;
+    if(document.getElementById('rBranch').value)        filled++;
+    if(document.getElementById('rEnroll').value.trim()) filled++;
+    if(document.getElementById('rPhone').value.trim())  filled++;
+    if(document.getElementById('rPass').value)          filled++;
+    if(document.getElementById('rQ1').value.trim())     filled++;
+    if(document.getElementById('rQ2').value.trim())     filled++;
+    if(document.getElementById('rQ3').value.trim())     filled++;
+    var pct = Math.round((filled/8)*100);
+    document.getElementById('regProgress').style.width  = pct+'%';
+    document.getElementById('regProgressLabel').textContent = filled+' / 8 filled';
+  }
+
+  fieldIds.forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.addEventListener('input', updateProgress);
+    if(el) el.addEventListener('change', updateProgress);
   });
-  var ppClose = document.getElementById('ppClose');
-  if(ppClose) ppClose.addEventListener('click', function(){ payPopupOver.classList.remove('open'); document.body.style.overflow=''; });
 
-  // =============================================
-  //  RENDER EVENTS
-  // =============================================
-  function renderEvents() {
-    var grid  = document.getElementById('eventsGrid');
-    var noMsg = document.getElementById('noEventsMsg');
-    if(!grid) return;
+  // Password strength
+  var rPass = document.getElementById('rPass');
+  if(rPass) rPass.addEventListener('input', function(){
+    var v=this.value, score=0;
+    if(v.length>=8) score++;
+    if(/[A-Z]/.test(v)) score++;
+    if(/[0-9]/.test(v)) score++;
+    if(/[^a-zA-Z0-9]/.test(v)) score++;
+    var bar = document.getElementById('psBar');
+    var colors = ['#ff5c5c','#ffb347','#e8b84b','#3ddc84'];
+    var widths = ['25%','50%','75%','100%'];
+    bar.style.width     = v.length ? widths[score-1]||'15%' : '0%';
+    bar.style.background= v.length ? colors[score-1]||'#ff5c5c' : '';
+  });
 
-    noMsg.style.display='none';
-    Array.from(grid.querySelectorAll('.event-card,.loading-msg')).forEach(function(c){ c.remove(); });
+  // Enrollment auto-uppercase
+  var rEnroll = document.getElementById('rEnroll');
+  if(rEnroll) rEnroll.addEventListener('input', function(){
+    var pos=this.selectionStart; this.value=this.value.toUpperCase(); this.setSelectionRange(pos,pos);
+    updateProgress();
+  });
 
-    var loader=document.createElement('div');
-    loader.className='loading-msg';
-    loader.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#9a97a3;font-family:\'JetBrains Mono\',monospace;font-size:0.85rem;letter-spacing:2px;">LOADING EVENTS...</div>';
-    grid.appendChild(loader);
+  // Validation
+  function vName(v)   { v=v.trim(); if(!v) return 'Name is required'; if(v.length<3) return 'At least 3 characters'; if(!/^[a-zA-Z\s]+$/.test(v)) return 'Letters only'; return ''; }
+  function vBranch(v) { return v?'':'Please select your branch'; }
+  function vEnroll(v) {
+    v=v.trim();
+    if(!v)           return 'Enrollment number is required';
+    if(v.length<15)  return 'Too short — exactly 15 characters (e.g. E23220932900034)';
+    if(v.length>15)  return 'Too long — exactly 15 characters';
+    if(!/^[A-Z]\d{14}$/.test(v)) return 'Format: 1 letter + 14 digits (e.g. E23220932900034)';
+    return '';
+  }
+  function vPhone(v) {
+    v=v.trim();
+    if(!v) return 'Phone number is required';
+    if(!/^[6-9]\d{9}$/.test(v)) return 'Enter valid 10-digit Indian mobile number';
+    return '';
+  }
+  function vPass(v) {
+    if(!v)          return 'Password is required';
+    if(v.length<6)  return 'At least 6 characters';
+    return '';
+  }
+  function vAns(v) { v=v.trim(); return v?'':'This answer is required'; }
 
-    fetchEvents(function(err, events){
-      Array.from(grid.querySelectorAll('.loading-msg')).forEach(function(c){ c.remove(); });
-      if(err){
-        noMsg.innerHTML='<div class="no-events-icon">⚠️</div><p>Could not load events. Check your internet.</p>';
-        noMsg.style.display='block'; return;
+  var regForm = document.getElementById('registerForm');
+  if(regForm) regForm.addEventListener('submit', function(e){
+    e.preventDefault();
+
+    var name    = document.getElementById('rName').value;
+    var branch  = document.getElementById('rBranch').value;
+    var enroll  = document.getElementById('rEnroll').value;
+    var phone   = document.getElementById('rPhone').value;
+    var pass    = document.getElementById('rPass').value;
+    var q1      = document.getElementById('rQ1').value;
+    var q2      = document.getElementById('rQ2').value;
+    var q3      = document.getElementById('rQ3').value;
+
+    var ne=vName(name), be=vBranch(branch), ee=vEnroll(enroll),
+        pe=vPhone(phone), pe2=vPass(pass),
+        qe1=vAns(q1), qe2=vAns(q2), qe3=vAns(q3);
+
+    setF('rName','rerr-name',ne);
+    setF('rBranch','rerr-branch',be);
+    setF('rEnroll','rerr-enroll',ee);
+    setF('rPhone','rerr-phone',pe);
+    setF('rPass','rerr-pass',pe2);
+    setF('rQ1','rerr-q1',qe1);
+    setF('rQ2','rerr-q2',qe2);
+    setF('rQ3','rerr-q3',qe3);
+
+    if(ne||be||ee||pe||pe2||qe1||qe2||qe3){
+      shake('registerCard'); return;
+    }
+
+    // Disable button, show loader
+    var btn = document.getElementById('regBtn');
+    setBtnLoading(btn, true);
+
+    // Check if enrollment already exists
+    fetchUsers(function(err, users){
+      if(err){ showToast('Connection error. Try again.','error'); setBtnLoading(btn,false); return; }
+
+      var exists = users.find(function(u){ return u.enrollment.toUpperCase()===enroll.trim().toUpperCase(); });
+      if(exists){
+        setF('rEnroll','rerr-enroll','This enrollment number is already registered!');
+        shake('registerCard'); setBtnLoading(btn,false); return;
       }
-      if(!events.length){
-        noMsg.innerHTML='<div class="no-events-icon">📅</div><p>No events yet. Click <strong>Create New Event</strong> to add one!</p>';
-        noMsg.style.display='block'; return;
+
+      var newUser = {
+        id:         Date.now(),
+        name:       name.trim(),
+        branch:     branch,
+        enrollment: enroll.trim().toUpperCase(),
+        phone:      phone.trim(),
+        password:   hashPass(pass),
+        security: {
+          q1: q1.trim().toLowerCase(),
+          q2: q2.trim().toLowerCase(),
+          q3: q3.trim().toLowerCase()
+        },
+        registeredAt: new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+      };
+
+      users.push(newUser);
+      saveUsers(users, function(err2){
+        if(err2){ showToast('Could not save. Try again.','error'); setBtnLoading(btn,false); return; }
+
+        // Save to localStorage for session
+        localStorage.setItem('gpg_current_user', JSON.stringify(newUser));
+
+        setBtnLoading(btn,false);
+        showSuccessOverlay('Registration Successful!', 'Welcome, '+newUser.name+'!');
+      });
+    });
+  });
+
+  // ─────────────────────────────────────────
+  //  LOGIN
+  // ─────────────────────────────────────────
+  var lEnroll = document.getElementById('lEnroll');
+  if(lEnroll) lEnroll.addEventListener('input', function(){
+    var pos=this.selectionStart; this.value=this.value.toUpperCase(); this.setSelectionRange(pos,pos);
+  });
+
+  var loginForm = document.getElementById('loginForm');
+  if(loginForm) loginForm.addEventListener('submit', function(e){
+    e.preventDefault();
+
+    var enroll = document.getElementById('lEnroll').value.trim().toUpperCase();
+    var pass   = document.getElementById('lPass').value;
+
+    var ee = vEnroll(enroll);
+    var pe = vPass(pass);
+    setF('lEnroll','lerr-enroll',ee);
+    setF('lPass','lerr-pass',pe);
+    if(ee||pe){ shake('loginCard'); return; }
+
+    var btn = document.getElementById('loginBtn');
+    setBtnLoading(btn,true);
+
+    fetchUsers(function(err, users){
+      if(err){ showToast('Connection error. Try again.','error'); setBtnLoading(btn,false); return; }
+
+      var user = users.find(function(u){ return u.enrollment.toUpperCase()===enroll; });
+      if(!user){
+        setF('lEnroll','lerr-enroll','Enrollment number not found. Please register first.');
+        shake('loginCard'); setBtnLoading(btn,false); return;
+      }
+      if(user.password !== hashPass(pass)){
+        setF('lPass','lerr-pass','Incorrect password.');
+        shake('loginCard'); setBtnLoading(btn,false); return;
       }
 
-      noMsg.style.display='none';
+      localStorage.setItem('gpg_current_user', JSON.stringify(user));
+      setBtnLoading(btn,false);
+      showSuccessOverlay('Welcome Back!', 'Signed in as '+user.name);
+    });
+  });
 
-      var loggedInUser=null;
-      try{ loggedInUser=JSON.parse(localStorage.getItem('gpg_current_user')); } catch(e){}
-      var loggedInName = loggedInUser ? loggedInUser.name.trim().toLowerCase()       : '';
-      var loggedInEnr  = loggedInUser ? (loggedInUser.enrollment||'').trim().toUpperCase() : '';
+  // ─────────────────────────────────────────
+  //  FORGOT PASSWORD
+  // ─────────────────────────────────────────
+  var _forgotUser = null;
 
-      events.forEach(function(ev, idx){
-        var today    = new Date(new Date().toDateString());
-        var lastDate = new Date(ev.lastDate);
-        var expired  = lastDate < today;
-        var daysLeft = Math.ceil((lastDate-today)/(1000*60*60*24));
-        var dateStr  = lastDate.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  window.showForgot = function(){
+    document.getElementById('forgotOverlay').classList.add('open');
+    document.body.style.overflow='hidden';
+    // Reset steps
+    document.getElementById('forgotStepA').style.display='block';
+    document.getElementById('forgotStepB').style.display='none';
+    document.getElementById('forgotStepC').style.display='none';
+    document.getElementById('fEnroll').value='';
+    _forgotUser=null;
+  };
+  window.closeForgot = function(){
+    document.getElementById('forgotOverlay').classList.remove('open');
+    document.body.style.overflow='';
+  };
 
-        var dueBadge = expired
-          ? '<span class="event-meta-val date-warning">Expired</span>'
-          : '<span class="event-meta-val'+(daysLeft<=3?' date-warning':'')+'">'+dateStr+(daysLeft<=3?' ('+daysLeft+' days left!)':'')+'</span>';
+  // Step 1 — find account
+  window.forgotStep1 = function(){
+    var enroll = document.getElementById('fEnroll').value.trim().toUpperCase();
+    var ee = vEnroll(enroll);
+    setF('fEnroll','ferr-enroll',ee);
+    if(ee){ shake('forgotModal'); return; }
 
-        // Match by enrollment number first (most reliable), fallback to name
-        var isCreator = false;
-        if(loggedInEnr && ev.createdByEnr) {
-          isCreator = (String(ev.createdByEnr).trim().toUpperCase() === String(loggedInEnr).trim().toUpperCase());
-        }
-        // Always also try name match as fallback (for old events without enrollment stored)
-        if(!isCreator && loggedInName && ev.createdBy) {
-          isCreator = (String(ev.createdBy).trim().toLowerCase() === String(loggedInName).trim().toLowerCase());
-        }
+    fetchUsers(function(err,users){
+      if(err){ showToast('Connection error.','error'); return; }
+      var user=users.find(function(u){ return u.enrollment.toUpperCase()===enroll; });
+      if(!user){ setF('fEnroll','ferr-enroll','No account found with this enrollment number.'); shake('forgotModal'); return; }
+      _forgotUser=user;
+      document.getElementById('forgotStepA').style.display='none';
+      document.getElementById('forgotStepB').style.display='block';
+    });
+  };
 
-        var deleteBtn = isCreator
-          ? '<button class="event-delete-btn" data-id="'+ev.id+'">&#128465; Delete</button>'
-          : '<span class="event-creator-only">Only creator can delete</span>';
+  // Step 2 — verify security answers
+  window.forgotStep2 = function(){
+    if(!_forgotUser) return;
+    var a1=document.getElementById('fQ1').value.trim().toLowerCase();
+    var a2=document.getElementById('fQ2').value.trim().toLowerCase();
+    var a3=document.getElementById('fQ3').value.trim().toLowerCase();
 
-        // Pay Now — show to everyone EXCEPT the creator
-        var hasPayment = ev.payment && (ev.payment.mobile || ev.payment.qr || ev.payment.upi);
-        var payBtn = (!isCreator && hasPayment)
-          ? '<button class="event-pay-btn" data-id="'+ev.id+'">&#128179; Pay Now</button>'
-          : (!isCreator ? '<span class="event-creator-only">Payment info not added</span>' : '');
+    var e1=a1?'':'Answer required', e2=a2?'':'Answer required', e3=a3?'':'Answer required';
+    setF('fQ1','ferr-fq1',e1); setF('fQ2','ferr-fq2',e2); setF('fQ3','ferr-fq3',e3);
+    if(e1||e2||e3){ shake('forgotModal'); return; }
 
-        var card=document.createElement('div');
-        card.className='event-card';
-        card.style.animationDelay=(idx*0.07)+'s';
-        card.dataset.id=ev.id;
-        card.dataset.ev=JSON.stringify(ev);
-        card.innerHTML=
-          '<div class="event-card-badge'+(expired?' expired':'')+'">'+( expired?'EXPIRED':'ACTIVE')+'</div>'+
-          '<div class="event-card-name">'+esc(ev.name)+'</div>'+
-          '<div class="event-card-reason">&#9670; '+esc(ev.reason)+'</div>'+
-          '<div class="event-card-desc">'+esc(ev.description)+'</div>'+
-          '<div class="event-card-meta">'+
-            '<div class="event-meta-row"><span class="event-meta-label">Amount</span><span class="event-meta-val amount">&#8377;'+ev.amount+' / student</span></div>'+
-            '<div class="event-meta-row"><span class="event-meta-label">Last Date</span>'+dueBadge+'</div>'+
-          '</div>'+
-          '<div class="event-card-footer">'+
-            '<span class="event-creator">By '+esc(ev.createdBy)+' &middot; '+esc(ev.createdAt)+'</span>'+
-            '<div style="display:flex;gap:8px;align-items:center;">'+payBtn+deleteBtn+'</div>'+
-          '</div>';
-        grid.appendChild(card);
+    var sec=_forgotUser.security;
+    if(a1!==sec.q1||a2!==sec.q2||a3!==sec.q3){
+      showToast('Answers do not match. Please try again.','error');
+      shake('forgotModal'); return;
+    }
+    document.getElementById('forgotStepB').style.display='none';
+    document.getElementById('forgotStepC').style.display='block';
+  };
+
+  // Step 3 — reset password
+  window.forgotStep3 = function(){
+    if(!_forgotUser) return;
+    var np=document.getElementById('fNewPass').value;
+    var pe=vPass(np);
+    setF('fNewPass','ferr-newpass',pe);
+    if(pe){ shake('forgotModal'); return; }
+
+    fetchUsers(function(err,users){
+      if(err){ showToast('Connection error.','error'); return; }
+      var idx=users.findIndex(function(u){ return u.enrollment===_forgotUser.enrollment; });
+      if(idx===-1){ showToast('User not found.','error'); return; }
+      users[idx].password=hashPass(np);
+      saveUsers(users,function(err2){
+        if(err2){ showToast('Could not save. Try again.','error'); return; }
+        closeForgot();
+        showToast('Password reset successfully!');
+        _forgotUser=null;
+        switchTab('login');
       });
+    });
+  };
 
-      // Pay Now click
-      grid.querySelectorAll('.event-pay-btn').forEach(function(btn){
-        btn.addEventListener('click', function(){
-          var ev=JSON.parse(this.closest('.event-card').dataset.ev);
-          openPaymentPopup(ev);
-        });
-      });
+  // ─────────────────────────────────────────
+  //  HELPERS
+  // ─────────────────────────────────────────
+  function setBtnLoading(btn, loading){
+    if(!btn) return;
+    btn.disabled=loading;
+    var t=btn.querySelector('.auth-btn-text'), a=btn.querySelector('.auth-btn-arrow'), l=btn.querySelector('.auth-btn-loader');
+    if(t) t.style.display=loading?'none':'inline';
+    if(a) a.style.display=loading?'none':'inline';
+    if(l) l.style.display=loading?'inline':'none';
+  }
 
-      // Delete click
-      grid.querySelectorAll('.event-delete-btn').forEach(function(btn){
-        btn.addEventListener('click', function(){
-          if(!confirm('Delete this event? This removes it for EVERYONE!')) return;
-          var id = String(this.dataset.id); // always string — avoids number vs string mismatch
-          var card=this.closest('.event-card');
-          if(card){ card.style.opacity='0.4'; card.style.pointerEvents='none'; }
-          fetchEvents(function(err,evs){
-            if(err){ alert('Could not connect. Try again.'); if(card){card.style.opacity='1';card.style.pointerEvents='';} return; }
-            evs=evs.filter(function(e){ return String(e.id) !== id; }); // compare both as strings
-            saveEvents(evs,function(err2){
-              if(err2){ alert('Could not delete. Try again.'); if(card){card.style.opacity='1';card.style.pointerEvents='';} return; }
-              renderEvents();
-            });
-          });
-        });
-      });
+  function shake(id){
+    var el=document.getElementById(id); if(!el) return;
+    [-7,7,-5,5,-3,3,0].forEach(function(m,i){
+      setTimeout(function(){ el.style.transform='translateX('+m+'px)'; },i*55);
     });
   }
 
-  renderEvents();
-  setInterval(renderEvents, 30000);
-
-  // =============================================
-  //  HELPERS
-  // =============================================
-  function detailRow(label, value) {
-    var d=document.createElement('div'); d.appendChild(document.createTextNode(value));
-    return '<div class="detail-row"><span class="detail-label">'+label+'</span><span class="detail-val">'+d.innerHTML+'</span></div>';
-  }
-  function swapCards(hideId, showId) {
-    var hide=document.getElementById(hideId), show=document.getElementById(showId);
-    hide.style.transition='opacity 0.35s ease,transform 0.35s ease';
-    hide.style.opacity='0'; hide.style.transform='translateY(-20px)';
-    setTimeout(function(){
-      hide.style.display='none'; show.style.display='block';
-      show.style.opacity='0'; show.style.transform='translateY(20px)';
-      show.style.transition='opacity 0.35s ease,transform 0.35s ease';
-      setTimeout(function(){ show.style.opacity='1'; show.style.transform='translateY(0)'; },40);
-    },380);
-  }
-  function shakeCard(id) {
-    var c=document.getElementById(id); if(!c) return;
-    [-8,8,-6,6,-4,4,0].forEach(function(m,i){ setTimeout(function(){ c.style.transform='translateX('+m+'px)'; },i*60); });
+  function showSuccessOverlay(title, msg){
+    document.getElementById('successTitle').textContent=title;
+    document.getElementById('successMsg').textContent=msg;
+    document.getElementById('successOverlay').style.display='flex';
   }
 
-  // ── Toast notification ─────────────────────
-  function showToast(message, type) {
-    // Remove any existing toast
-    var old = document.getElementById('gpgToast');
-    if(old) old.remove();
+  window.goToDashboard = function(){
+    // Will go to dashboard page when built
+    showToast('Dashboard coming soon!');
+    document.getElementById('successOverlay').style.display='none';
+  };
 
-    var toast = document.createElement('div');
-    toast.id = 'gpgToast';
-    toast.className = 'gpg-toast gpg-toast-' + (type||'success');
-    toast.innerHTML = message;
-    document.body.appendChild(toast);
+  // ── Check if already logged in ──────────
+  try {
+    var cur = JSON.parse(localStorage.getItem('gpg_current_user'));
+    if(cur && cur.name) {
+      // Auto-fill login form
+      if(document.getElementById('lEnroll')) document.getElementById('lEnroll').value=cur.enrollment;
+    }
+  } catch(e){}
 
-    // Animate in
-    setTimeout(function(){ toast.classList.add('gpg-toast-show'); }, 10);
-
-    // Remove after 2.5 seconds
-    setTimeout(function(){
-      toast.classList.remove('gpg-toast-show');
-      setTimeout(function(){ if(toast.parentNode) toast.remove(); }, 400);
-    }, 2500);
-  }
-});
-
-function goToDashboard() { alert('Dashboard coming soon!'); }
+}); // DOMContentLoaded
