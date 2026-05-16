@@ -1,332 +1,322 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GP Gonda – Event Payment Tracker</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <title>GP Gonda — Event Payment Tracker</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 </head>
 <body>
 
-  <div class="bg-grid"></div>
-  <div class="bg-glow"></div>
+  <!-- Animated background -->
+  <div class="bg-wrap">
+    <div class="bg-orb orb1"></div>
+    <div class="bg-orb orb2"></div>
+    <div class="bg-orb orb3"></div>
+    <div class="bg-noise"></div>
+    <div class="bg-grid"></div>
+  </div>
 
-  <!-- HEADER -->
+  <!-- ===== HEADER ===== -->
   <header class="site-header">
     <div class="header-inner">
-      <div class="college-logo">
-        <img src="logo.png" id="logoImg" alt="GP Gonda Logo" class="logo-img" />
-        <div class="logo-fallback" id="logoFallback">GP</div>
-        <div class="logo-text">
-          <span class="college-name">Government Polytechnic Gonda</span>
-          <span class="college-sub">Event Payment Tracker</span>
+      <div class="brand">
+        <div class="brand-logo">
+          <img src="logo.png" alt="GP Gonda" id="headerLogo" onerror="this.style.display='none';document.getElementById('headerLogoFb').style.display='flex'"/>
+          <div class="brand-logo-fb" id="headerLogoFb">GP</div>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">Govt. Polytechnic Gonda</span>
+          <span class="brand-tag">Event Payment Tracker</span>
         </div>
       </div>
-      <div class="header-badge">Student Portal</div>
+      <div class="header-pill">Student Portal</div>
     </div>
   </header>
 
-  <!-- HERO / SIGNUP -->
-  <section class="hero">
-    <div class="hero-content">
-      <div class="hero-tag">Welcome</div>
-      <h1 class="hero-title">Track Your<span class="hero-accent">Event Payments</span></h1>
-      <p class="hero-desc">One simple place for all students of GP Gonda to manage and track payments for college events and project equipment.</p>
-      <div class="hero-stats">
-        <div class="hstat"><span class="hstat-num">200+</span><span class="hstat-label">Students</span></div>
-        <div class="hstat-divider"></div>
-        <div class="hstat"><span class="hstat-num">Fast</span><span class="hstat-label">Tracking</span></div>
-        <div class="hstat-divider"></div>
-        <div class="hstat"><span class="hstat-num">Free</span><span class="hstat-label">Always</span></div>
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main-wrap">
+
+    <!-- Left decorative side -->
+    <div class="deco-side">
+      <div class="deco-title">
+        <span class="deco-line"></span>
+        <p>Government</p>
+        <p>Polytechnic</p>
+        <p class="deco-accent">Gonda</p>
       </div>
+      <div class="deco-stats">
+        <div class="deco-stat"><span class="ds-val">200+</span><span class="ds-lbl">Students</span></div>
+        <div class="deco-stat"><span class="ds-val">Free</span><span class="ds-lbl">Forever</span></div>
+        <div class="deco-stat"><span class="ds-val">Live</span><span class="ds-lbl">Tracking</span></div>
+      </div>
+      <div class="deco-motto">"Work is Worship"</div>
     </div>
 
-    <div class="hero-card-wrap">
-      <div class="signup-card" id="signupCard">
-        <div class="card-step">Step 1 of 1</div>
-        <h2 class="card-title">Create Your Account</h2>
-        <p class="card-subtitle">Fill in your details to get started</p>
+    <!-- Right — Auth Card -->
+    <div class="auth-side">
 
-        <form id="signupForm" novalidate>
-          <div class="field-group" id="fg-name">
-            <label class="field-label" for="studentName"><span class="label-icon">&#9670;</span> Full Name</label>
-            <div class="input-wrap"><input type="text" id="studentName" placeholder="e.g. Rahul Kumar" autocomplete="name" /></div>
-            <span class="field-error" id="err-name"></span>
+      <!-- TAB SWITCHER -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabRegister" onclick="switchTab('register')">Register</button>
+        <button class="auth-tab" id="tabLogin" onclick="switchTab('login')">Sign In</button>
+        <div class="tab-slider" id="tabSlider"></div>
+      </div>
+
+      <!-- ===== REGISTER FORM ===== -->
+      <div class="auth-card" id="registerCard">
+        <div class="auth-card-header">
+          <h2 class="auth-card-title">Create Account</h2>
+          <p class="auth-card-sub">Fill in your details to get started</p>
+        </div>
+
+        <form id="registerForm" novalidate>
+
+          <!-- Progress bar -->
+          <div class="form-progress">
+            <div class="fp-track"><div class="fp-fill" id="regProgress"></div></div>
+            <span class="fp-label" id="regProgressLabel">0 / 9 filled</span>
           </div>
 
-          <div class="field-group" id="fg-branch">
-            <label class="field-label" for="studentBranch"><span class="label-icon">&#9670;</span> Branch / Department</label>
-            <div class="input-wrap select-wrap">
-              <select id="studentBranch">
+          <!-- Full Name -->
+          <div class="fg" id="fg-rname">
+            <label class="flabel" for="rName">Full Name</label>
+            <div class="finput-wrap">
+              <span class="finput-icon">◈</span>
+              <input class="finput" type="text" id="rName" placeholder="e.g. Anand Kumar" autocomplete="name"/>
+            </div>
+            <span class="ferr" id="rerr-name"></span>
+          </div>
+
+          <!-- Branch -->
+          <div class="fg" id="fg-rbranch">
+            <label class="flabel" for="rBranch">Branch / Department</label>
+            <div class="finput-wrap select-wrap">
+              <span class="finput-icon">◈</span>
+              <select class="finput" id="rBranch">
                 <option value="" disabled selected>Select your branch</option>
-                <option>Civil Engineering</option>
-                <option>Computer Science</option>
-                <option>Electrical Engineering</option>
-                <option>Electronics Engineering</option>
-                <option>Mechanical Engineering</option>
-                <option>Information Technology</option>
-                <option>Other</option>
+                <option value="Electrical Engineering">Electrical Engineering</option>
+                <option value="Electrical Engineering (Industrial Control)">Electrical Engineering (Industrial Control)</option>
+                <option value="Electronics Engineering">Electronics Engineering</option>
+                <option value="Mechanical Engineering (Production)">Mechanical Engineering (Production)</option>
+                <option value="Civil Engineering">Civil Engineering</option>
               </select>
-              <span class="select-arrow">&#9660;</span>
+              <span class="sel-arrow">▾</span>
             </div>
-            <span class="field-error" id="err-branch"></span>
+            <span class="ferr" id="rerr-branch"></span>
           </div>
 
-          <div class="field-group" id="fg-enroll">
-            <label class="field-label" for="enrollNo"><span class="label-icon">&#9670;</span> Enrollment Number</label>
-            <div class="input-wrap">
-              <input type="text" id="enrollNo" placeholder="e.g. E23220932900034" autocomplete="off"
-                style="font-family:'JetBrains Mono',monospace; letter-spacing:0.06em;" />
+          <!-- Enrollment -->
+          <div class="fg" id="fg-renroll">
+            <label class="flabel" for="rEnroll">Enrollment Number</label>
+            <div class="finput-wrap">
+              <span class="finput-icon">◈</span>
+              <input class="finput mono" type="text" id="rEnroll" placeholder="e.g. E23220932900034" maxlength="15"/>
             </div>
-            <span class="field-error" id="err-enroll"></span>
-            <div class="enroll-hint">Format: <span>1 letter + 14 digits</span> — total 15 characters</div>
+            <span class="ferr" id="rerr-enroll"></span>
           </div>
 
-          <button type="submit" class="submit-btn" id="submitBtn">
-            <span id="btnText">Register Now</span>
-            <span id="btnArrow">&#8594;</span>
-            <span id="btnLoader" style="display:none;">&#9679;&#9679;&#9679;</span>
+          <!-- Phone -->
+          <div class="fg" id="fg-rphone">
+            <label class="flabel" for="rPhone">Phone Number</label>
+            <div class="finput-wrap">
+              <span class="finput-icon">◈</span>
+              <input class="finput" type="tel" id="rPhone" placeholder="10-digit mobile number" maxlength="10"/>
+            </div>
+            <span class="ferr" id="rerr-phone"></span>
+          </div>
+
+          <!-- Password -->
+          <div class="fg" id="fg-rpass">
+            <label class="flabel" for="rPass">Password</label>
+            <div class="finput-wrap">
+              <span class="finput-icon">◈</span>
+              <input class="finput" type="password" id="rPass" placeholder="Create a strong password"/>
+              <button type="button" class="eye-btn" onclick="togglePass('rPass',this)">👁</button>
+            </div>
+            <div class="pass-strength" id="passStrength"><div class="ps-bar" id="psBar"></div></div>
+            <span class="ferr" id="rerr-pass"></span>
+          </div>
+
+          <!-- Security Questions -->
+          <div class="sq-header">
+            <span class="sq-icon">🔐</span>
+            <div>
+              <p class="sq-title">Security Questions</p>
+              <p class="sq-sub">Used to recover your account if you forget password</p>
+            </div>
+          </div>
+
+          <!-- Q1 -->
+          <div class="fg" id="fg-rq1">
+            <label class="flabel">What is your Birth Place?</label>
+            <div class="finput-wrap">
+              <span class="finput-icon">◈</span>
+              <input class="finput" type="text" id="rQ1" placeholder="Your answer"/>
+            </div>
+            <span class="ferr" id="rerr-q1"></span>
+          </div>
+
+          <!-- Q2 -->
+          <div class="fg" id="fg-rq2">
+            <label class="flabel">What is your Grandmother's name?</label>
+            <div class="finput-wrap">
+              <span class="finput-icon">◈</span>
+              <input class="finput" type="text" id="rQ2" placeholder="Your answer"/>
+            </div>
+            <span class="ferr" id="rerr-q2"></span>
+          </div>
+
+          <!-- Q3 -->
+          <div class="fg" id="fg-rq3">
+            <label class="flabel">What is your favorite animal / pet?</label>
+            <div class="finput-wrap">
+              <span class="finput-icon">◈</span>
+              <input class="finput" type="text" id="rQ3" placeholder="Your answer"/>
+            </div>
+            <span class="ferr" id="rerr-q3"></span>
+          </div>
+
+          <button type="submit" class="auth-btn" id="regBtn">
+            <span class="auth-btn-text">Create Account</span>
+            <span class="auth-btn-arrow">→</span>
+            <span class="auth-btn-loader" style="display:none">···</span>
           </button>
+
         </form>
 
-        <p class="login-link">Already registered? <a href="#" id="goLogin">Sign In here</a></p>
+        <p class="auth-switch">Already have an account? <a href="#" onclick="switchTab('login');return false;">Sign In here</a></p>
       </div>
 
-      <div class="success-card" id="successCard" style="display:none;">
-        <div class="success-icon">&#10003;</div>
-        <h2 class="success-title">Registration Successful!</h2>
-        <p class="success-msg">Welcome to GP Gonda Payment Tracker</p>
-        <div class="success-details" id="successDetails"></div>
-        <button class="submit-btn" onclick="goToDashboard()">
-          <span>Go to Dashboard</span><span>&#8594;</span>
-        </button>
-      </div>
-    </div>
-  </section>
-
-
-
-  <!-- ===== CREATE EVENT SECTION ===== -->
-  <section class="create-event-section">
-    <div class="ce-inner">
-      <div class="ce-left">
-        <div class="section-label">Organise &amp; Collect</div>
-        <h2 class="section-title">Create Event</h2>
-        <p class="ce-desc">Create a new payment event for your batch. Every student will instantly see the event details on the home page.</p>
-      </div>
-      <div class="ce-right">
-        <button class="create-event-btn" id="openEventModal">
-          <span class="ce-plus">&#43;</span>
-          Create New Event
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== EVENTS LIST SECTION ===== -->
-  <section class="events-list-section">
-    <div class="events-list-inner">
-      <div class="section-label">Active Events</div>
-      <h2 class="section-title">All Events</h2>
-      <div class="events-grid" id="eventsGrid">
-        <!-- Event cards render here by JS -->
-        <div class="no-events-msg" id="noEventsMsg">
-          <div class="no-events-icon">&#128197;</div>
-          <p>No events yet. Click <strong>Create New Event</strong> to add one!</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== CREATE EVENT MODAL ===== -->
-  <div class="modal-overlay" id="eventModalOverlay" aria-hidden="true">
-    <div class="modal-box" id="eventModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-
-      <!-- STEP INDICATOR -->
-      <div class="modal-steps">
-        <div class="modal-step active" id="stepDot1"><span>1</span><small>Event Details</small></div>
-        <div class="modal-step-line"></div>
-        <div class="modal-step" id="stepDot2"><span>2</span><small>Payment Method</small></div>
-      </div>
-
-      <!-- ── STEP 1: EVENT DETAILS ── -->
-      <div id="modalStep1">
-        <div class="modal-header">
-          <div>
-            <div class="modal-tag">Step 1 of 2</div>
-            <h3 class="modal-title" id="modalTitle">Event Details</h3>
-            <p class="modal-subtitle">Fill every field to proceed to payment setup</p>
-          </div>
-          <button class="modal-close" id="closeEventModal" aria-label="Close modal">&#10005;</button>
+      <!-- ===== LOGIN FORM ===== -->
+      <div class="auth-card" id="loginCard" style="display:none;">
+        <div class="auth-card-header">
+          <h2 class="auth-card-title">Welcome Back</h2>
+          <p class="auth-card-sub">Sign in to your account</p>
         </div>
 
-        <div class="modal-body">
-          <div class="field-group" id="mfg-ename">
-            <label class="field-label" for="evtName"><span class="label-icon">&#9670;</span> Event Name</label>
-            <div class="input-wrap"><input type="text" id="evtName" placeholder="e.g. Annual Tech Fest 2025" maxlength="80" /></div>
-            <span class="field-error" id="merr-ename"></span>
-          </div>
+        <form id="loginForm" novalidate>
 
-          <div class="field-group" id="mfg-reason">
-            <label class="field-label" for="evtReason"><span class="label-icon">&#9670;</span> Reason for Collection</label>
-            <div class="input-wrap"><input type="text" id="evtReason" placeholder="e.g. Equipment purchase, decoration, prizes…" maxlength="120" /></div>
-            <span class="field-error" id="merr-reason"></span>
-          </div>
-
-          <div class="field-group" id="mfg-desc">
-            <label class="field-label" for="evtDesc"><span class="label-icon">&#9670;</span> Description</label>
-            <div class="input-wrap"><textarea id="evtDesc" rows="3" placeholder="Write a short description about the event…" maxlength="400"></textarea></div>
-            <span class="field-error" id="merr-desc"></span>
-          </div>
-
-          <div class="field-group" id="mfg-amount">
-            <label class="field-label" for="evtAmount"><span class="label-icon">&#9670;</span> Amount Needed <span style="color:var(--text-muted);font-size:0.7rem;">(&#8377; per student)</span></label>
-            <div class="input-wrap amount-wrap">
-              <span class="amount-prefix">&#8377;</span>
-              <input type="number" id="evtAmount" placeholder="e.g. 150" min="1" max="99999" style="padding-left:2.2rem;" />
+          <!-- Enrollment -->
+          <div class="fg" id="fg-lenroll">
+            <label class="flabel" for="lEnroll">Enrollment Number</label>
+            <div class="finput-wrap">
+              <span class="finput-icon">◈</span>
+              <input class="finput mono" type="text" id="lEnroll" placeholder="e.g. E23220932900034" maxlength="15"/>
             </div>
-            <span class="field-error" id="merr-amount"></span>
+            <span class="ferr" id="lerr-enroll"></span>
           </div>
 
-          <div class="field-group" id="mfg-date">
-            <label class="field-label" for="evtDate"><span class="label-icon">&#9670;</span> Last Date for Payment</label>
-            <div class="input-wrap"><input type="date" id="evtDate" /></div>
-            <span class="field-error" id="merr-date"></span>
-          </div>
-
-          <!-- Step 1 button → goes to Step 2 -->
-          <button class="submit-btn save-evt-btn" id="goToPaymentBtn" disabled>
-            <span id="goPayText">Fill all fields to continue</span>
-            <span id="goPayArrow" style="display:none;">&#8594; Add Payment Method</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- ── STEP 2: PAYMENT METHOD ── -->
-      <div id="modalStep2" style="display:none;">
-        <div class="modal-header">
-          <div>
-            <div class="modal-tag">Step 2 of 2</div>
-            <h3 class="modal-title">Payment Method</h3>
-            <p class="modal-subtitle">Students will use these details to pay you</p>
-          </div>
-          <button class="modal-close" id="closeEventModal2" aria-label="Close modal">&#10005;</button>
-        </div>
-
-        <div class="modal-body">
-
-          <!-- Back button -->
-          <button class="back-btn" id="backToStep1">&#8592; Back to Event Details</button>
-
-          <!-- Mobile Number — Important -->
-          <div class="field-group" id="mfg-mobile">
-            <label class="field-label" for="payMobile">
-              <span class="label-icon">&#9670;</span> Mobile Number for Payment
-              <span class="field-required">&#9733; Important</span>
-            </label>
-            <div class="input-wrap">
-              <input type="tel" id="payMobile" placeholder="e.g. 9876543210" maxlength="10" />
+          <!-- Password -->
+          <div class="fg" id="fg-lpass">
+            <label class="flabel" for="lPass">Password</label>
+            <div class="finput-wrap">
+              <span class="finput-icon">◈</span>
+              <input class="finput" type="password" id="lPass" placeholder="Enter your password"/>
+              <button type="button" class="eye-btn" onclick="togglePass('lPass',this)">👁</button>
             </div>
-            <span class="field-error" id="merr-mobile"></span>
-            <span class="field-hint">Students will send payment to this number via PhonePe / GPay / Paytm</span>
+            <span class="ferr" id="lerr-pass"></span>
           </div>
 
-          <!-- UPI ID — Optional -->
-          <div class="field-group" id="mfg-upi">
-            <label class="field-label" for="payUpi">
-              <span class="label-icon">&#9670;</span> UPI ID
-              <span class="field-optional">Optional</span>
-            </label>
-            <div class="input-wrap">
-              <input type="text" id="payUpi" placeholder="e.g. anandkumar@upi" maxlength="60" />
-            </div>
-            <span class="field-error" id="merr-upi"></span>
-            <span class="field-hint">Example: yourname@okicici, yourname@ybl, yourname@paytm</span>
+          <div class="forgot-row">
+            <a href="#" id="forgotLink" onclick="showForgot();return false;">Forgot password?</a>
           </div>
 
-          <!-- QR Code Upload — Important -->
-          <div class="field-group" id="mfg-qr">
-            <label class="field-label" for="payQr">
-              <span class="label-icon">&#9670;</span> Upload QR Code
-              <span class="field-required">&#9733; Important</span>
-            </label>
-            <div class="qr-upload-box" id="qrUploadBox">
-              <input type="file" id="payQr" accept="image/*" style="display:none;" />
-              <div class="qr-upload-inner" id="qrUploadInner" onclick="document.getElementById('payQr').click()">
-                <div class="qr-upload-icon">&#128247;</div>
-                <div class="qr-upload-text">Click to upload your QR code</div>
-                <div class="qr-upload-sub">PNG, JPG supported</div>
-              </div>
-              <img id="qrPreview" src="" alt="QR Preview" style="display:none;" />
-            </div>
-            <span class="field-error" id="merr-qr"></span>
-            <span class="field-hint">Students will scan this QR code to pay directly</span>
-          </div>
-
-          <!-- Final Save Button -->
-          <button class="submit-btn save-evt-btn" id="saveEventBtn">
-            <span id="saveEvtText">&#10003; Save Event &amp; Payment Details</span>
-            <span id="saveEvtLoader" style="display:none; letter-spacing:4px; font-size:0.75rem;">&#9679;&#9679;&#9679;</span>
+          <button type="submit" class="auth-btn" id="loginBtn">
+            <span class="auth-btn-text">Sign In</span>
+            <span class="auth-btn-arrow">→</span>
+            <span class="auth-btn-loader" style="display:none">···</span>
           </button>
 
-        </div>
+        </form>
+
+        <p class="auth-switch">New here? <a href="#" onclick="switchTab('register');return false;">Create an account</a></p>
       </div>
 
-    </div>
-  </div>
+    </div><!-- /auth-side -->
+  </main>
 
-  <!-- ===== PAYMENT INFO POPUP (for students) ===== -->
-  <div class="modal-overlay" id="paymentPopupOverlay" aria-hidden="true">
-    <div class="modal-box payment-popup" id="paymentPopup" role="dialog" aria-modal="true">
-      <div class="modal-header">
+  <!-- ===== FORGOT PASSWORD MODAL ===== -->
+  <div class="modal-overlay" id="forgotOverlay">
+    <div class="modal-box" id="forgotModal">
+      <div class="modal-top">
         <div>
-          <div class="modal-tag">&#128179; Pay Now</div>
-          <h3 class="modal-title" id="ppEventName">Event Name</h3>
-          <p class="modal-subtitle">Scan QR or use the details below to pay</p>
+          <div class="modal-eyebrow">Account Recovery</div>
+          <h3 class="modal-title">Reset Password</h3>
+          <p class="modal-sub">Answer your security questions to reset your password</p>
         </div>
-        <button class="modal-close" id="ppClose" aria-label="Close">&#10005;</button>
+        <button class="modal-x" onclick="closeForgot()">✕</button>
       </div>
       <div class="modal-body">
 
-        <!-- Amount -->
-        <div class="pp-amount-box">
-          <span class="pp-amount-label">Amount to Pay</span>
-          <span class="pp-amount-val">&#8377;<span id="ppAmount">0</span></span>
-        </div>
-
-        <!-- QR Code -->
-        <div class="pp-qr-wrap">
-          <img id="ppQrImg" src="" alt="Payment QR Code" />
-          <p class="pp-qr-hint">&#128247; Scan with PhonePe / GPay / Paytm</p>
-        </div>
-
-        <!-- Details -->
-        <div class="pp-details">
-          <div class="pp-detail-row">
-            <span class="pp-detail-label">&#128241; Mobile (UPI Pay)</span>
-            <span class="pp-detail-val" id="ppMobile">—</span>
+        <!-- Step A: Enter Enrollment -->
+        <div id="forgotStepA">
+          <div class="fg">
+            <label class="flabel">Enrollment Number</label>
+            <div class="finput-wrap">
+              <span class="finput-icon">◈</span>
+              <input class="finput mono" type="text" id="fEnroll" placeholder="E23220932900034" maxlength="15"/>
+            </div>
+            <span class="ferr" id="ferr-enroll"></span>
           </div>
-          <div class="pp-detail-row">
-            <span class="pp-detail-label">&#128279; UPI ID</span>
-            <span class="pp-detail-val" id="ppUpi">—</span>
-          </div>
+          <button class="auth-btn" onclick="forgotStep1()">
+            <span>Find My Account</span><span>→</span>
+          </button>
         </div>
 
-        <div class="pp-note">
-          &#9888;&#65039; After payment, inform your class admin with your name and screenshot.
+        <!-- Step B: Answer Questions -->
+        <div id="forgotStepB" style="display:none;">
+          <div class="fg">
+            <label class="flabel">What is your Birth Place?</label>
+            <div class="finput-wrap"><span class="finput-icon">◈</span><input class="finput" type="text" id="fQ1" placeholder="Your answer"/></div>
+            <span class="ferr" id="ferr-fq1"></span>
+          </div>
+          <div class="fg">
+            <label class="flabel">What is your Grandmother's name?</label>
+            <div class="finput-wrap"><span class="finput-icon">◈</span><input class="finput" type="text" id="fQ2" placeholder="Your answer"/></div>
+            <span class="ferr" id="ferr-fq2"></span>
+          </div>
+          <div class="fg">
+            <label class="flabel">What is your favorite animal / pet?</label>
+            <div class="finput-wrap"><span class="finput-icon">◈</span><input class="finput" type="text" id="fQ3" placeholder="Your answer"/></div>
+            <span class="ferr" id="ferr-fq3"></span>
+          </div>
+          <button class="auth-btn" onclick="forgotStep2()"><span>Verify Answers</span><span>→</span></button>
         </div>
+
+        <!-- Step C: New Password -->
+        <div id="forgotStepC" style="display:none;">
+          <div class="fg">
+            <label class="flabel">New Password</label>
+            <div class="finput-wrap">
+              <span class="finput-icon">◈</span>
+              <input class="finput" type="password" id="fNewPass" placeholder="Enter new password"/>
+              <button type="button" class="eye-btn" onclick="togglePass('fNewPass',this)">👁</button>
+            </div>
+            <span class="ferr" id="ferr-newpass"></span>
+          </div>
+          <button class="auth-btn" onclick="forgotStep3()"><span>Reset Password</span><span>→</span></button>
+        </div>
+
       </div>
     </div>
   </div>
 
-  <!-- FOOTER -->
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <span class="footer-college">Government Polytechnic Gonda</span>
-      <span class="footer-copy">&copy; 2025 · All rights reserved</span>
+  <!-- ===== SUCCESS OVERLAY ===== -->
+  <div class="success-overlay" id="successOverlay" style="display:none;">
+    <div class="success-box">
+      <div class="success-check">✓</div>
+      <h2 class="success-title" id="successTitle">Registered!</h2>
+      <p class="success-msg" id="successMsg">Welcome to GP Gonda Tracker</p>
+      <button class="auth-btn" onclick="goToDashboard()">
+        <span>Go to Dashboard</span><span>→</span>
+      </button>
     </div>
-  </footer>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
 
   <script src="script.js"></script>
 </body>
