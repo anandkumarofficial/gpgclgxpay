@@ -4,349 +4,35 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>GP Gonda – Event Payment Tracker</title>
+  <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-  <style>
-    :root {
-      --bg-base:       #0a0a0f;
-      --bg-card:       #16161f;
-      --bg-input:      #1c1c27;
-      --accent:        #f0a500;
-      --accent-dim:    rgba(240,165,0,0.13);
-      --accent-glow:   rgba(240,165,0,0.27);
-      --text-primary:  #f0ede8;
-      --text-secondary:#9a97a3;
-      --text-muted:    #55525f;
-      --border:        #2a2835;
-      --danger:        #ff4e4e;
-      --success:       #3ddc84;
-      --font-display:  'Bebas Neue', sans-serif;
-      --font-body:     'DM Sans', sans-serif;
-      --font-mono:     'JetBrains Mono', monospace;
-      --radius-sm:     6px;
-      --radius-md:     12px;
-      --radius-lg:     20px;
-    }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: var(--font-body);
-      background-color: var(--bg-base);
-      color: var(--text-primary);
-      min-height: 100vh;
-      overflow-x: hidden;
-      line-height: 1.6;
-    }
-    .bg-grid {
-      position: fixed; inset: 0;
-      background-image:
-        linear-gradient(rgba(240,165,0,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(240,165,0,0.04) 1px, transparent 1px);
-      background-size: 60px 60px;
-      pointer-events: none; z-index: 0;
-    }
-    .bg-glow {
-      position: fixed; top: -200px; right: -200px;
-      width: 700px; height: 700px;
-      background: radial-gradient(circle, rgba(240,165,0,0.06) 0%, transparent 70%);
-      pointer-events: none; z-index: 0;
-    }
-    .site-header {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(10,10,15,0.88);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-    }
-    .header-inner {
-      max-width: 1200px; margin: 0 auto;
-      padding: 0.85rem 2rem;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .college-logo { display: flex; align-items: center; gap: 0.85rem; }
-    .logo-img {
-      width: 46px; height: 46px; object-fit: contain;
-      background: #fff; border-radius: var(--radius-sm);
-      padding: 3px; flex-shrink: 0;
-    }
-    .logo-fallback {
-      width: 46px; height: 46px;
-      background: var(--accent); color: #000;
-      font-family: var(--font-display); font-size: 1.2rem;
-      display: none; align-items: center; justify-content: center;
-      border-radius: var(--radius-sm); flex-shrink: 0;
-    }
-    .logo-text { display: flex; flex-direction: column; }
-    .college-name {
-      font-family: var(--font-display); font-size: 1.35rem;
-      letter-spacing: 2px; color: var(--text-primary); line-height: 1.1;
-    }
-    .college-sub {
-      font-size: 0.68rem; color: var(--accent);
-      letter-spacing: 3px; text-transform: uppercase; margin-top: 2px;
-    }
-    .header-badge {
-      font-size: 0.68rem; font-family: var(--font-mono);
-      letter-spacing: 2px; text-transform: uppercase;
-      color: var(--accent); border: 1px solid var(--accent);
-      padding: 4px 12px; border-radius: 999px; opacity: 0.8;
-    }
-    .hero {
-      position: relative; z-index: 1;
-      max-width: 1200px; margin: 0 auto;
-      padding: 5rem 2rem 4rem;
-      display: grid; grid-template-columns: 1fr 1fr;
-      align-items: center; gap: 4rem; min-height: 90vh;
-    }
-    .hero-tag {
-      font-family: var(--font-mono); font-size: 0.72rem;
-      letter-spacing: 4px; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 1.2rem;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .hero-tag::before {
-      content: ''; display: inline-block;
-      width: 30px; height: 1px; background: var(--accent);
-    }
-    .hero-title {
-      font-family: var(--font-display);
-      font-size: clamp(3.5rem, 6vw, 5.5rem);
-      line-height: 0.95; letter-spacing: 2px;
-      color: var(--text-primary); margin-bottom: 1.5rem;
-    }
-    .hero-accent { color: var(--accent); display: block; }
-    .hero-desc {
-      font-size: 1rem; color: var(--text-secondary);
-      max-width: 420px; line-height: 1.8; margin-bottom: 2.5rem;
-    }
-    .hero-stats { display: flex; align-items: center; gap: 1.5rem; }
-    .hstat { display: flex; flex-direction: column; }
-    .hstat-num {
-      font-family: var(--font-display); font-size: 2rem;
-      letter-spacing: 1px; color: var(--text-primary); line-height: 1;
-    }
-    .hstat-label {
-      font-size: 0.68rem; letter-spacing: 3px; text-transform: uppercase;
-      color: var(--text-muted); margin-top: 4px;
-    }
-    .hstat-divider { width: 1px; height: 40px; background: var(--border); }
-    .hero-card-wrap { position: relative; z-index: 1; }
-    .signup-card, .success-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius-lg); padding: 2.5rem;
-      position: relative; overflow: hidden;
-      animation: slideUp 0.7s cubic-bezier(0.4,0,0.2,1) both;
-    }
-    .signup-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    }
-    .success-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, transparent, var(--success), transparent);
-    }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .card-step {
-      font-family: var(--font-mono); font-size: 0.68rem;
-      letter-spacing: 3px; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 0.5rem;
-    }
-    .card-title {
-      font-family: var(--font-display); font-size: 2rem;
-      letter-spacing: 2px; color: var(--text-primary); margin-bottom: 0.3rem;
-    }
-    .card-subtitle {
-      font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 2rem;
-    }
-    .field-group { margin-bottom: 1.5rem; }
-    .field-label {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase;
-      color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 500;
-    }
-    .label-icon { color: var(--accent); font-size: 0.58rem; }
-    .input-wrap { position: relative; }
-    .input-wrap input,
-    .input-wrap select {
-      width: 100%; background: var(--bg-input);
-      border: 1px solid var(--border); border-radius: var(--radius-sm);
-      color: var(--text-primary); font-family: var(--font-body);
-      font-size: 1rem; padding: 0.85rem 1rem;
-      outline: none; appearance: none; -webkit-appearance: none;
-      transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
-    }
-    .input-wrap input::placeholder { color: var(--text-muted); }
-    .input-wrap input:focus,
-    .input-wrap select:focus {
-      border-color: var(--accent); background: #1f1f2c;
-      box-shadow: 0 0 0 3px var(--accent-dim);
-    }
-    .input-wrap input.error,
-    .input-wrap select.error {
-      border-color: var(--danger);
-      box-shadow: 0 0 0 3px rgba(255,78,78,0.12);
-    }
-    .input-wrap input.valid,
-    .input-wrap select.valid { border-color: var(--success); }
-    .select-wrap select { padding-right: 2.5rem; cursor: pointer; }
-    .select-wrap select option { background: var(--bg-card); color: var(--text-primary); }
-    .select-arrow {
-      position: absolute; right: 1rem; top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted); font-size: 0.65rem; pointer-events: none;
-    }
-    .field-error {
-      display: block; font-size: 0.75rem; color: var(--danger);
-      margin-top: 5px; min-height: 1em; font-family: var(--font-mono);
-    }
-    .enroll-hint {
-      font-size: 0.72rem; color: var(--text-muted);
-      font-family: var(--font-mono); margin-top: 5px;
-    }
-    .enroll-hint span { color: var(--accent); }
-    .submit-btn {
-      width: 100%; margin-top: 0.5rem; padding: 1rem 1.5rem;
-      background: var(--accent); color: #000; border: none;
-      border-radius: var(--radius-sm); font-family: var(--font-display);
-      font-size: 1.2rem; letter-spacing: 3px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-    }
-    .submit-btn:hover {
-      background: #ffc233;
-      box-shadow: 0 0 30px var(--accent-glow);
-      transform: translateY(-2px);
-    }
-    .submit-btn:active { transform: translateY(0); }
-    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-    .btn-loader { letter-spacing: 4px; font-size: 0.75rem; animation: blink 1s infinite; }
-    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
-    .login-link {
-      text-align: center; margin-top: 1.2rem;
-      font-size: 0.85rem; color: var(--text-muted);
-    }
-    .login-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
-    .login-link a:hover { text-decoration: underline; }
-    .success-card { text-align: center; }
-    .success-icon {
-      width: 72px; height: 72px;
-      background: rgba(61,220,132,0.1); border: 2px solid var(--success);
-      border-radius: 50%; font-size: 2rem; color: var(--success);
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 1.5rem;
-      animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both;
-    }
-    @keyframes popIn {
-      from { opacity:0; transform:scale(0.5); }
-      to   { opacity:1; transform:scale(1); }
-    }
-    .success-title {
-      font-family: var(--font-display); font-size: 2rem;
-      letter-spacing: 2px; color: var(--text-primary); margin-bottom: 0.5rem;
-    }
-    .success-msg { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 2rem; }
-    .success-details {
-      background: var(--bg-input); border: 1px solid var(--border);
-      border-radius: var(--radius-md); padding: 1.2rem;
-      margin-bottom: 2rem; text-align: left;
-    }
-    .detail-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 0.5rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem;
-    }
-    .detail-row:last-child { border-bottom: none; }
-    .detail-label { color: var(--text-muted); font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; }
-    .detail-val { color: var(--text-primary); font-family: var(--font-mono); font-size: 0.85rem; }
-    .features-section {
-      position: relative; z-index: 1;
-      max-width: 1200px; margin: 0 auto;
-      padding: 5rem 2rem; border-top: 1px solid var(--border);
-    }
-    .section-label {
-      font-family: var(--font-mono); font-size: 0.72rem;
-      letter-spacing: 4px; text-transform: uppercase;
-      color: var(--accent); margin-bottom: 1rem;
-    }
-    .section-title {
-      font-family: var(--font-display);
-      font-size: clamp(2.5rem, 4vw, 3.5rem);
-      letter-spacing: 2px; color: var(--text-primary); margin-bottom: 3rem;
-    }
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
-    }
-    .feature-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: var(--radius-md); padding: 2rem 1.5rem;
-      transition: border-color 0.25s, transform 0.25s;
-    }
-    .feature-card:hover { border-color: var(--accent); transform: translateY(-4px); }
-    .feat-icon { font-size: 2rem; margin-bottom: 1rem; }
-    .feature-card h3 {
-      font-family: var(--font-display); font-size: 1.4rem;
-      letter-spacing: 1px; color: var(--text-primary); margin-bottom: 0.6rem;
-    }
-    .feature-card p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7; }
-    .site-footer {
-      position: relative; z-index: 1;
-      border-top: 1px solid var(--border); padding: 1.5rem 2rem;
-    }
-    .footer-inner {
-      max-width: 1200px; margin: 0 auto;
-      display: flex; justify-content: space-between; align-items: center;
-      flex-wrap: wrap; gap: 0.5rem;
-    }
-    .footer-college {
-      font-family: var(--font-display); font-size: 1rem;
-      letter-spacing: 2px; color: var(--text-secondary);
-    }
-    .footer-copy { font-size: 0.78rem; color: var(--text-muted); font-family: var(--font-mono); }
-    @media (max-width: 900px) {
-      .hero { grid-template-columns: 1fr; min-height: auto; padding: 3rem 1.5rem; gap: 2.5rem; }
-      .hero-title { font-size: 3.5rem; }
-      .college-name { font-size: 1.1rem; }
-    }
-    @media (max-width: 540px) {
-      .header-inner { padding: 0.8rem 1rem; }
-      .header-badge { display: none; }
-      .signup-card, .success-card { padding: 1.8rem 1.3rem; }
-      .hero-stats { gap: 1rem; }
-      .footer-inner { flex-direction: column; text-align: center; }
-    }
-  </style>
 </head>
 <body>
 
   <div class="bg-grid"></div>
   <div class="bg-glow"></div>
 
+  <!-- HEADER -->
   <header class="site-header">
     <div class="header-inner">
       <div class="college-logo">
-        <img src="logo.png" alt="GP Gonda Logo" class="logo-img" id="logoImg" />
+        <img src="logo.png" id="logoImg" alt="GP Gonda Logo" class="logo-img" />
         <div class="logo-fallback" id="logoFallback">GP</div>
         <div class="logo-text">
           <span class="college-name">Government Polytechnic Gonda</span>
-          <span class="college-sub">Students Payment Tracker</span>
+          <span class="college-sub">Event Payment Tracker</span>
         </div>
       </div>
       <div class="header-badge">Student Portal</div>
     </div>
   </header>
 
+  <!-- HERO / SIGNUP -->
   <section class="hero">
     <div class="hero-content">
       <div class="hero-tag">Welcome</div>
-      <h1 class="hero-title">
-        Track Your<br/>
-        <span class="hero-accent">Event Payments</span>
-      </h1>
-      <p class="hero-desc">
-        One simple place for all students of GP Gonda to manage and track payments for college events and project equipment.
-      </p>
+      <h1 class="hero-title">Track Your<span class="hero-accent">Event Payments</span></h1>
+      <p class="hero-desc">One simple place for all students of GP Gonda to manage and track payments for college events and project equipment.</p>
       <div class="hero-stats">
         <div class="hstat"><span class="hstat-num">200+</span><span class="hstat-label">Students</span></div>
         <div class="hstat-divider"></div>
@@ -357,36 +43,29 @@
     </div>
 
     <div class="hero-card-wrap">
-
       <div class="signup-card" id="signupCard">
         <div class="card-step">Step 1 of 1</div>
         <h2 class="card-title">Create Your Account</h2>
         <p class="card-subtitle">Fill in your details to get started</p>
 
         <form id="signupForm" novalidate>
-
-          <div class="field-group">
-            <label class="field-label" for="studentName">
-              <span class="label-icon">&#9670;</span> Full Name
-            </label>
-            <div class="input-wrap">
-              <input type="text" id="studentName" placeholder="e.g. Anand Kumar" autocomplete="name" />
-            </div>
+          <div class="field-group" id="fg-name">
+            <label class="field-label" for="studentName"><span class="label-icon">&#9670;</span> Full Name</label>
+            <div class="input-wrap"><input type="text" id="studentName" placeholder="e.g. Rahul Kumar" autocomplete="name" /></div>
             <span class="field-error" id="err-name"></span>
           </div>
 
-          <div class="field-group">
-            <label class="field-label" for="studentBranch">
-              <span class="label-icon">&#9670;</span> Branch / Department
-            </label>
+          <div class="field-group" id="fg-branch">
+            <label class="field-label" for="studentBranch"><span class="label-icon">&#9670;</span> Branch / Department</label>
             <div class="input-wrap select-wrap">
               <select id="studentBranch">
                 <option value="" disabled selected>Select your branch</option>
-                <option>Electrical Engineering</option>
-                <option>Electrical Engineering (Industrial Control)</option>
-                <option>Electronics Engineering</option>
-                <option>Mechanical Engineering (Production)</option>
                 <option>Civil Engineering</option>
+                <option>Computer Science</option>
+                <option>Electrical Engineering</option>
+                <option>Electronics Engineering</option>
+                <option>Mechanical Engineering</option>
+                <option>Information Technology</option>
                 <option>Other</option>
               </select>
               <span class="select-arrow">&#9660;</span>
@@ -394,13 +73,10 @@
             <span class="field-error" id="err-branch"></span>
           </div>
 
-          <div class="field-group">
-            <label class="field-label" for="enrollNo">
-              <span class="label-icon">&#9670;</span> Enrollment Number
-            </label>
+          <div class="field-group" id="fg-enroll">
+            <label class="field-label" for="enrollNo"><span class="label-icon">&#9670;</span> Enrollment Number</label>
             <div class="input-wrap">
-              <input type="text" id="enrollNo" placeholder="e.g. E12345678910123"
-                autocomplete="off"
+              <input type="text" id="enrollNo" placeholder="e.g. E23220932900034" autocomplete="off"
                 style="font-family:'JetBrains Mono',monospace; letter-spacing:0.06em;" />
             </div>
             <span class="field-error" id="err-enroll"></span>
@@ -412,7 +88,6 @@
             <span id="btnArrow">&#8594;</span>
             <span id="btnLoader" style="display:none;">&#9679;&#9679;&#9679;</span>
           </button>
-
         </form>
 
         <p class="login-link">Already registered? <a href="#" id="goLogin">Sign In here</a></p>
@@ -424,175 +99,136 @@
         <p class="success-msg">Welcome to GP Gonda Payment Tracker</p>
         <div class="success-details" id="successDetails"></div>
         <button class="submit-btn" onclick="goToDashboard()">
-          <span>Go to Dashboard</span>
-          <span>&#8594;</span>
+          <span>Go to Dashboard</span><span>&#8594;</span>
         </button>
       </div>
-
     </div>
   </section>
 
+  <!-- FEATURES -->
   <section class="features-section">
     <div class="section-label">Why use this?</div>
     <h2 class="section-title">Everything you need</h2>
     <div class="features-grid">
-      <div class="feature-card">
-        <div class="feat-icon">&#128275;</div>
-        <h3>Easy Signup</h3>
-        <p>Register in seconds with just your name, branch, and enrollment number.</p>
+      <div class="feature-card"><div class="feat-icon">&#128275;</div><h3>Easy Signup</h3><p>Register in seconds with just your name, branch, and enrollment number.</p></div>
+      <div class="feature-card"><div class="feat-icon">&#128200;</div><h3>Live Tracking</h3><p>See real-time payment status for all students in your batch.</p></div>
+      <div class="feature-card"><div class="feat-icon">&#128276;</div><h3>Reminders</h3><p>Auto-generate reminder messages for students who haven't paid yet.</p></div>
+      <div class="feature-card"><div class="feat-icon">&#128203;</div><h3>History Log</h3><p>Full record of every payment — who paid, when, and how much.</p></div>
+    </div>
+  </section>
+
+  <!-- ===== CREATE EVENT SECTION ===== -->
+  <section class="create-event-section">
+    <div class="ce-inner">
+      <div class="ce-left">
+        <div class="section-label">Organise &amp; Collect</div>
+        <h2 class="section-title">Create Event</h2>
+        <p class="ce-desc">Create a new payment event for your batch. Every student will instantly see the event details on the home page.</p>
       </div>
-      <div class="feature-card">
-        <div class="feat-icon">&#128200;</div>
-        <h3>Live Tracking</h3>
-        <p>See real-time payment status for all students in your batch.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feat-icon">&#128276;</div>
-        <h3>Reminders</h3>
-        <p>Auto-generate reminder messages for students who haven't paid yet.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feat-icon">&#128203;</div>
-        <h3>History Log</h3>
-        <p>Full record of every payment — who paid, when, and how much.</p>
+      <div class="ce-right">
+        <button class="create-event-btn" id="openEventModal">
+          <span class="ce-plus">&#43;</span>
+          Create New Event
+        </button>
       </div>
     </div>
   </section>
 
+  <!-- ===== EVENTS LIST SECTION ===== -->
+  <section class="events-list-section">
+    <div class="events-list-inner">
+      <div class="section-label">Active Events</div>
+      <h2 class="section-title">All Events</h2>
+      <div class="events-grid" id="eventsGrid">
+        <!-- Event cards render here by JS -->
+        <div class="no-events-msg" id="noEventsMsg">
+          <div class="no-events-icon">&#128197;</div>
+          <p>No events yet. Click <strong>Create New Event</strong> to add one!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CREATE EVENT MODAL ===== -->
+  <div class="modal-overlay" id="eventModalOverlay" aria-hidden="true">
+    <div class="modal-box" id="eventModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+
+      <div class="modal-header">
+        <div>
+          <div class="modal-tag">&#43; New Event</div>
+          <h3 class="modal-title" id="modalTitle">Create Event</h3>
+          <p class="modal-subtitle">Fill every field — Save button enables automatically</p>
+        </div>
+        <button class="modal-close" id="closeEventModal" aria-label="Close modal">&#10005;</button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Event Name -->
+        <div class="field-group" id="mfg-ename">
+          <label class="field-label" for="evtName"><span class="label-icon">&#9670;</span> Event Name</label>
+          <div class="input-wrap">
+            <input type="text" id="evtName" placeholder="e.g. Annual Tech Fest 2025" maxlength="80" />
+          </div>
+          <span class="field-error" id="merr-ename"></span>
+        </div>
+
+        <!-- Reason -->
+        <div class="field-group" id="mfg-reason">
+          <label class="field-label" for="evtReason"><span class="label-icon">&#9670;</span> Reason for Collection</label>
+          <div class="input-wrap">
+            <input type="text" id="evtReason" placeholder="e.g. Equipment purchase, decoration, prizes…" maxlength="120" />
+          </div>
+          <span class="field-error" id="merr-reason"></span>
+        </div>
+
+        <!-- Description -->
+        <div class="field-group" id="mfg-desc">
+          <label class="field-label" for="evtDesc"><span class="label-icon">&#9670;</span> Description</label>
+          <div class="input-wrap">
+            <textarea id="evtDesc" rows="3" placeholder="Write a short description about the event…" maxlength="400"></textarea>
+          </div>
+          <span class="field-error" id="merr-desc"></span>
+        </div>
+
+        <!-- Amount -->
+        <div class="field-group" id="mfg-amount">
+          <label class="field-label" for="evtAmount"><span class="label-icon">&#9670;</span> Amount Needed <span style="color:var(--text-muted);font-size:0.7rem;">(&#8377; per student)</span></label>
+          <div class="input-wrap amount-wrap">
+            <span class="amount-prefix">&#8377;</span>
+            <input type="number" id="evtAmount" placeholder="e.g. 150" min="1" max="99999" style="padding-left:2.2rem;" />
+          </div>
+          <span class="field-error" id="merr-amount"></span>
+        </div>
+
+        <!-- Last Date -->
+        <div class="field-group" id="mfg-date">
+          <label class="field-label" for="evtDate"><span class="label-icon">&#9670;</span> Last Date for Payment</label>
+          <div class="input-wrap">
+            <input type="date" id="evtDate" />
+          </div>
+          <span class="field-error" id="merr-date"></span>
+        </div>
+
+        <!-- Save Button — disabled until all fields filled -->
+        <button class="submit-btn save-evt-btn" id="saveEventBtn" disabled>
+          <span id="saveEvtText">Fill all fields to enable Save</span>
+          <span id="saveEvtArrow" style="display:none;">&#8594;</span>
+          <span id="saveEvtLoader" style="display:none; letter-spacing:4px; font-size:0.75rem;">&#9679;&#9679;&#9679;</span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
   <footer class="site-footer">
     <div class="footer-inner">
-      <span class="footer-college">Government Polytechnic Gonda/Anand Kumar</span>
-      <span class="footer-copy">&copy; 2026 · All rights reserved</span>
+      <span class="footer-college">Government Polytechnic Gonda</span>
+      <span class="footer-copy">&copy; 2025 · All rights reserved</span>
     </div>
   </footer>
 
-  <script>
-    // --- Logo fallback if logo.png not found ---
-    document.getElementById('logoImg').onerror = function() {
-      this.style.display = 'none';
-      document.getElementById('logoFallback').style.display = 'flex';
-    };
-
-    // --- Validation ---
-    function validateName(v) {
-      v = v.trim();
-      if (!v)                        return 'Name is required';
-      if (v.length < 3)              return 'Name must be at least 3 characters';
-      if (!/^[a-zA-Z\s]+$/.test(v)) return 'Name should only contain letters';
-      return '';
-    }
-    function validateBranch(v) {
-      return v ? '' : 'Please select your branch';
-    }
-    function validateEnroll(v) {
-      v = v.trim();
-      if (!v)        return 'Enrollment number is required';
-      if (v.length < 15) return 'Too short — must be exactly 15 characters (e.g. E23220932900034)';
-      if (v.length > 15) return 'Too long — must be exactly 15 characters (e.g. E23220932900034)';
-      if (!/^[A-Z]\d{14}$/.test(v)) return 'Must start with 1 letter then 14 digits (e.g. E23220932900034)';
-      return '';
-    }
-
-    function setField(inputId, errId, msg) {
-      var inp = document.getElementById(inputId);
-      var err = document.getElementById(errId);
-      err.textContent = msg;
-      if (msg) { inp.classList.add('error'); inp.classList.remove('valid'); }
-      else     { inp.classList.remove('error'); inp.classList.add('valid'); }
-    }
-
-    // --- Live validation ---
-    document.getElementById('studentName').addEventListener('input', function() {
-      setField('studentName', 'err-name', validateName(this.value));
-    });
-    document.getElementById('studentBranch').addEventListener('change', function() {
-      setField('studentBranch', 'err-branch', validateBranch(this.value));
-    });
-    document.getElementById('enrollNo').addEventListener('input', function() {
-      var pos = this.selectionStart;
-      this.value = this.value.toUpperCase();
-      this.setSelectionRange(pos, pos);
-      setField('enrollNo', 'err-enroll', validateEnroll(this.value));
-    });
-
-    // --- Submit ---
-    document.getElementById('signupForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      var ne = validateName(document.getElementById('studentName').value);
-      var be = validateBranch(document.getElementById('studentBranch').value);
-      var ee = validateEnroll(document.getElementById('enrollNo').value);
-      setField('studentName',   'err-name',   ne);
-      setField('studentBranch', 'err-branch', be);
-      setField('enrollNo',      'err-enroll', ee);
-      if (ne || be || ee) { shake(); return; }
-
-      // Show loader
-      var btn = document.getElementById('submitBtn');
-      btn.disabled = true;
-      document.getElementById('btnText').style.display  = 'none';
-      document.getElementById('btnArrow').style.display = 'none';
-      document.getElementById('btnLoader').style.display = 'inline';
-
-      var data = {
-        name:       document.getElementById('studentName').value.trim(),
-        branch:     document.getElementById('studentBranch').value,
-        enrollment: document.getElementById('enrollNo').value.trim().toUpperCase(),
-        registeredAt: new Date().toLocaleString('en-IN', {
-          day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'
-        }),
-        paid: false
-      };
-
-      setTimeout(function() {
-        // Save
-        try {
-          var students = JSON.parse(localStorage.getItem('gpg_students') || '[]');
-          if (!students.find(function(s){ return s.enrollment === data.enrollment; }))
-            students.push(data);
-          localStorage.setItem('gpg_students', JSON.stringify(students));
-          localStorage.setItem('gpg_current_user', JSON.stringify(data));
-        } catch(ex) {}
-
-        // Build success detail rows
-        document.getElementById('successDetails').innerHTML =
-          row('Name', data.name) + row('Branch', data.branch) +
-          row('Enrollment', data.enrollment) + row('Registered', data.registeredAt);
-
-        // Animate card swap
-        var sc = document.getElementById('signupCard');
-        var rc = document.getElementById('successCard');
-        sc.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
-        sc.style.opacity = '0'; sc.style.transform = 'translateY(-20px)';
-        setTimeout(function() {
-          sc.style.display = 'none';
-          rc.style.display = 'block';
-          rc.style.opacity = '0'; rc.style.transform = 'translateY(20px)';
-          rc.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
-          setTimeout(function() { rc.style.opacity='1'; rc.style.transform='translateY(0)'; }, 40);
-        }, 380);
-      }, 1200);
-    });
-
-    function row(label, value) {
-      var d = document.createElement('div'); d.appendChild(document.createTextNode(value));
-      return '<div class="detail-row"><span class="detail-label">' + label +
-        '</span><span class="detail-val">' + d.innerHTML + '</span></div>';
-    }
-
-    function shake() {
-      var c = document.getElementById('signupCard');
-      [-8,8,-6,6,-4,4,0].forEach(function(m,i){
-        setTimeout(function(){ c.style.transform = 'translateX('+m+'px)'; }, i*60);
-      });
-    }
-
-    document.getElementById('goLogin').addEventListener('click', function(e){
-      e.preventDefault(); alert('Login page coming soon!');
-    });
-
-    function goToDashboard() {
-      alert('Dashboard coming soon! Your registration is saved.');
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
