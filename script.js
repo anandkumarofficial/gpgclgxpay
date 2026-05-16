@@ -283,6 +283,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
       noMsg.style.display = 'none';
 
+      // Get the currently logged-in user
+      var loggedInUser = null;
+      try { loggedInUser = JSON.parse(localStorage.getItem('gpg_current_user')); } catch(e) {}
+      var loggedInName = loggedInUser ? loggedInUser.name.trim().toLowerCase() : '';
+
       events.forEach(function (ev, idx) {
         var today    = new Date(new Date().toDateString());
         var lastDate = new Date(ev.lastDate);
@@ -292,6 +297,12 @@ document.addEventListener('DOMContentLoaded', function () {
         var dueBadge = expired
           ? '<span class="event-meta-val date-warning">Expired</span>'
           : '<span class="event-meta-val' + (daysLeft<=3?' date-warning':'') + '">' + dateStr + (daysLeft<=3?' ('+daysLeft+' days left!)':'') + '</span>';
+
+        // Only show Delete button if current user is the one who created this event
+        var isCreator = loggedInName && ev.createdBy && (ev.createdBy.trim().toLowerCase() === loggedInName);
+        var deleteBtn = isCreator
+          ? '<button class="event-delete-btn" data-id="'+ev.id+'">&#128465; Delete</button>'
+          : '<span class="event-creator-only">Only creator can delete</span>';
 
         var card = document.createElement('div');
         card.className = 'event-card';
@@ -307,8 +318,8 @@ document.addEventListener('DOMContentLoaded', function () {
             '<div class="event-meta-row"><span class="event-meta-label">Last Date</span>'+dueBadge+'</div>'+
           '</div>'+
           '<div class="event-card-footer">'+
-            '<span class="event-creator">Created by '+esc(ev.createdBy)+' &middot; '+esc(ev.createdAt)+'</span>'+
-            '<button class="event-delete-btn" data-id="'+ev.id+'">Delete</button>'+
+            '<span class="event-creator">By '+esc(ev.createdBy)+' &middot; '+esc(ev.createdAt)+'</span>'+
+            deleteBtn+
           '</div>';
         grid.appendChild(card);
       });
