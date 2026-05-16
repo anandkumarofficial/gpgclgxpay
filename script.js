@@ -423,9 +423,11 @@ document.addEventListener('DOMContentLoaded', function () {
         // Match by enrollment number first (most reliable), fallback to name
         var isCreator = false;
         if(loggedInEnr && ev.createdByEnr) {
-          isCreator = (ev.createdByEnr.trim().toUpperCase() === loggedInEnr);
-        } else if(loggedInName && ev.createdBy) {
-          isCreator = (ev.createdBy.trim().toLowerCase() === loggedInName);
+          isCreator = (String(ev.createdByEnr).trim().toUpperCase() === String(loggedInEnr).trim().toUpperCase());
+        }
+        // Always also try name match as fallback (for old events without enrollment stored)
+        if(!isCreator && loggedInName && ev.createdBy) {
+          isCreator = (String(ev.createdBy).trim().toLowerCase() === String(loggedInName).trim().toLowerCase());
         }
 
         var deleteBtn = isCreator
@@ -471,12 +473,12 @@ document.addEventListener('DOMContentLoaded', function () {
       grid.querySelectorAll('.event-delete-btn').forEach(function(btn){
         btn.addEventListener('click', function(){
           if(!confirm('Delete this event? This removes it for EVERYONE!')) return;
-          var id=parseInt(this.dataset.id);
+          var id = String(this.dataset.id); // always string — avoids number vs string mismatch
           var card=this.closest('.event-card');
           if(card){ card.style.opacity='0.4'; card.style.pointerEvents='none'; }
           fetchEvents(function(err,evs){
             if(err){ alert('Could not connect. Try again.'); if(card){card.style.opacity='1';card.style.pointerEvents='';} return; }
-            evs=evs.filter(function(e){ return e.id!==id; });
+            evs=evs.filter(function(e){ return String(e.id) !== id; }); // compare both as strings
             saveEvents(evs,function(err2){
               if(err2){ alert('Could not delete. Try again.'); if(card){card.style.opacity='1';card.style.pointerEvents='';} return; }
               renderEvents();
