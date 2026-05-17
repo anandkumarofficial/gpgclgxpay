@@ -1,277 +1,799 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GP Gonda — Event Payment Tracker</title>
-  <link rel="stylesheet" href="style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <title>GP Gonda — Students Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --gold: #f0a500;
+      --gold-dim: #b87a00;
+      --gold-glow: rgba(240,165,0,0.18);
+      --gold-glow-strong: rgba(240,165,0,0.35);
+      --card-bg: #111118;
+      --card-border: rgba(240,165,0,0.15);
+      --text: #e8e8f0;
+      --text-dim: #888899;
+      --white: #ffffff;
+      --error: #ff4d4d;
+      --success: #00c97a;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── GRID BACKGROUND ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(240,165,0,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(240,165,0,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── GOLD GLOW RIGHT SIDE ── */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -10%;
+      right: -8%;
+      width: 520px;
+      height: 520px;
+      background: radial-gradient(circle, var(--gold-glow-strong) 0%, transparent 68%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ══════════════════════════════════
+       MAIN BACKGROUND PAGE
+    ══════════════════════════════════ */
+    .main-bg {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Floating top bar */
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 40px;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-icon {
+      width: 48px; height: 48px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 16px var(--gold-glow);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-icon img {
+      width: 100%; height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .logo-text {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1.3;
+      color: var(--text);
+    }
+    .logo-text span { color: var(--gold); display: block; font-size: 11px; font-weight: 400; letter-spacing: 2px; text-transform: uppercase; }
+
+    .nav-btns { display: flex; gap: 12px; }
+
+    .btn {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 1px;
+      padding: 9px 22px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.25s;
+    }
+    .btn-ghost {
+      background: transparent;
+      border: 1.5px solid var(--card-border);
+      color: var(--text-dim);
+    }
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-gold {
+      background: var(--gold);
+      color: #0a0a0f;
+      box-shadow: 0 0 18px var(--gold-glow);
+    }
+    .btn-gold:hover { background: #ffc130; box-shadow: 0 0 28px rgba(240,165,0,0.5); transform: translateY(-1px); }
+
+    /* ── HERO SECTION ── */
+    .hero {
+      text-align: center;
+      padding: 0 24px;
+      position: relative;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--card-border);
+      padding: 6px 18px;
+      border-radius: 50px;
+      margin-bottom: 28px;
+      background: rgba(240,165,0,0.06);
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(56px, 11vw, 110px);
+      line-height: 0.9;
+      letter-spacing: 4px;
+      color: var(--white);
+      animation: fadeUp 0.8s 0.1s ease both;
+    }
+    .hero-title .gold { color: var(--gold); text-shadow: 0 0 40px var(--gold-glow-strong); }
+
+    .hero-subtitle {
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--text-dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 500;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    .events-soon {
+      margin-top: 60px;
+      position: relative;
+      animation: fadeUp 0.8s 0.35s ease both;
+    }
+
+    .events-soon-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px 48px;
+      box-shadow: 0 0 48px rgba(0,0,0,0.4), inset 0 1px 0 rgba(240,165,0,0.08);
+    }
+
+    .pulse-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 10px var(--gold);
+      animation: pulse 1.6s infinite;
+      flex-shrink: 0;
+    }
+
+    .events-soon-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 28px;
+      letter-spacing: 3px;
+      color: var(--text-dim);
+    }
+    .events-soon-text .hl { color: var(--gold); }
+
+    .cta-row {
+      margin-top: 40px;
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      animation: fadeUp 0.8s 0.45s ease both;
+    }
+
+    .btn-large { font-size: 15px; padding: 13px 34px; border-radius: 10px; letter-spacing: 1.5px; }
+
+    /* ── DECORATIVE LINES ── */
+    .deco-line {
+      width: 120px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 20px auto 0;
+      opacity: 0.5;
+    }
+
+    /* ══════════════════════════════════
+       POPUP OVERLAY
+    ══════════════════════════════════ */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5,5,10,0.82);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: overlayIn 0.4s ease;
+    }
+    .overlay.hidden { display: none; }
+
+    .popup {
+      background: #0e0e16;
+      border: 1px solid rgba(240,165,0,0.25);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 480px;
+      padding: 36px 36px 32px;
+      position: relative;
+      box-shadow: 0 0 80px rgba(240,165,0,0.12), 0 40px 80px rgba(0,0,0,0.5);
+      animation: popupIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    /* Gold top glow line */
+    .popup::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      border-radius: 2px;
+    }
+
+    .popup-close {
+      position: absolute;
+      top: 16px; right: 18px;
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 22px;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+    .popup-close:hover { color: var(--gold); }
+
+    .popup-logo {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .popup-logo-icon {
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      width: 56px; height: 56px;
+      background: rgba(240,165,0,0.08);
+      border: 1.5px solid rgba(240,165,0,0.25);
+      border-radius: 14px;
+      box-shadow: 0 0 20px var(--gold-glow);
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+
+    .popup-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      letter-spacing: 3px;
+      color: var(--white);
+      text-align: center;
+    }
+    .popup-subtitle {
+      font-size: 12px;
+      color: var(--text-dim);
+      text-align: center;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    /* Tabs */
+    .tab-row {
+      display: flex;
+      gap: 0;
+      background: rgba(255,255,255,0.04);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 24px;
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 9px;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 1px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text-dim);
+      transition: all 0.25s;
+      border: none;
+      background: none;
+    }
+    .tab.active {
+      background: var(--gold);
+      color: #0a0a0f;
+      box-shadow: 0 0 14px var(--gold-glow);
+    }
+
+    /* Form fields */
+    .field {
+      margin-bottom: 16px;
+    }
+    .field label {
+      display: block;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 7px;
+    }
+    .field input, .field select {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1.5px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      appearance: none;
+    }
+    .field select { cursor: pointer; }
+    .field input::placeholder { color: rgba(255,255,255,0.2); }
+    .field input:focus, .field select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(240,165,0,0.1);
+    }
+    .field input.error { border-color: var(--error); }
+
+    .field-row { display: flex; gap: 12px; }
+    .field-row .field { flex: 1; }
+
+    .form-note {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-align: center;
+      margin-top: -4px;
+      margin-bottom: 18px;
+      font-family: 'Rajdhani', sans-serif;
+    }
+
+    .msg-box {
+      padding: 11px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      margin-bottom: 14px;
+      display: none;
+    }
+    .msg-box.error { background: rgba(255,77,77,0.12); border: 1px solid rgba(255,77,77,0.3); color: #ff7070; display: block; }
+    .msg-box.success { background: rgba(0,201,122,0.1); border: 1px solid rgba(0,201,122,0.3); color: #00c97a; display: block; }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      background: var(--gold);
+      color: #0a0a0f;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.25s;
+      box-shadow: 0 0 20px var(--gold-glow);
+      margin-top: 4px;
+    }
+    .btn-submit:hover { background: #ffc130; transform: translateY(-1px); box-shadow: 0 0 32px rgba(240,165,0,0.45); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    .switch-text {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 13px;
+      color: var(--text-dim);
+      font-family: 'Rajdhani', sans-serif;
+    }
+    .switch-text a {
+      color: var(--gold);
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .switch-text a:hover { text-decoration: underline; }
+
+    /* Login form fields */
+    #login-form, #register-form { display: none; }
+    #login-form.active, #register-form.active { display: block; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes overlayIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes popupIn {
+      from { opacity: 0; transform: scale(0.88) translateY(20px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes pulse {
+      0%,100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.6; }
+    }
+
+    /* Loading spinner */
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(0,0,0,0.3);
+      border-top-color: #0a0a0f;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 540px) {
+      .top-bar { padding: 14px 20px; }
+      .nav-btns .btn-ghost { display: none; }
+      .popup { padding: 28px 20px 24px; }
+      .hero-title { font-size: 54px; }
+      .events-soon-card { padding: 18px 24px; }
+      .events-soon-text { font-size: 20px; }
+      .field-row { flex-direction: column; gap: 0; }
+    }
+  </style>
 </head>
 <body>
 
-  <div class="bg-grid"></div>
-  <div class="bg-glow"></div>
+<!-- ══════════════════════════════════
+     MAIN BACKGROUND PAGE
+══════════════════════════════════ -->
+<div class="main-bg">
 
-  <!-- HEADER -->
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="brand">
-        <div class="brand-logo">
-          <img src="logo.png" alt="GP Gonda" onerror="this.style.display='none';document.getElementById('logoFb').style.display='flex'"/>
-          <div class="brand-logo-fb" id="logoFb">GP</div>
-        </div>
-        <div class="brand-text">
-          <span class="brand-name">Government Polytechnic Gonda</span>
-          <span class="brand-sub">Event Payment Tracker</span>
-        </div>
+  <!-- TOP BAR -->
+  <nav class="top-bar">
+    <div class="logo-wrap">
+      <div class="logo-icon"><img src="logo.png" alt="GP Gonda Logo"/></div>
+      <div class="logo-text">
+        Government Polytechnic Gonda
+        <span>Students Portal</span>
       </div>
-      <div class="header-pill">Student Portal</div>
     </div>
-  </header>
+    <div class="nav-btns">
+      <button class="btn btn-ghost" onclick="openPopup('login')">Login</button>
+      <button class="btn btn-gold" onclick="openPopup('register')">Register</button>
+    </div>
+  </nav>
 
   <!-- HERO -->
-  <section class="hero">
-    <div class="hero-left">
-      <div class="hero-tag">Welcome</div>
-      <h1 class="hero-title">
-        One Place.<br/>
-        <span class="hero-accent">All Payments.</span>
-      </h1>
-      <p class="hero-desc">
-        Register once and track every event payment for Government Polytechnic Gonda — from any device, anytime.
-      </p>
-      <div class="hero-stats">
-        <div class="hstat"><span class="hstat-n">200+</span><span class="hstat-l">Students</span></div>
-        <div class="hstat-div"></div>
-        <div class="hstat"><span class="hstat-n">Live</span><span class="hstat-l">Tracking</span></div>
-        <div class="hstat-div"></div>
-        <div class="hstat"><span class="hstat-n">Free</span><span class="hstat-l">Always</span></div>
+  <div class="hero">
+    <div class="hero-badge">&#9733; Official Student Events Portal</div>
+    <h1 class="hero-title">GP <span class="gold">GONDA</span></h1>
+    <p class="hero-subtitle">Government Polytechnic Gonda &nbsp;·&nbsp; Student Events</p>
+    <div class="deco-line"></div>
+
+    <div class="events-soon">
+      <div class="events-soon-card">
+        <div class="pulse-dot"></div>
+        <div class="events-soon-text">Events Will Upload <span class="hl">Soon ..!</span></div>
+        <div class="pulse-dot"></div>
       </div>
     </div>
 
-    <div class="hero-right">
-
-      <!-- TAB SWITCHER -->
-      <div class="auth-tabs">
-        <button class="auth-tab active" id="tabReg" onclick="switchTab('register')">Register</button>
-        <button class="auth-tab" id="tabLog" onclick="switchTab('login')">Sign In</button>
-        <div class="tab-ink" id="tabInk"></div>
-      </div>
-
-      <!-- REGISTER CARD -->
-      <div class="auth-card" id="registerCard">
-        <div class="card-eyebrow">Step 1 of 1</div>
-        <h2 class="card-title">Create Account</h2>
-        <p class="card-sub">Fill your details to get started</p>
-
-        <!-- Progress -->
-        <div class="prog-wrap">
-          <div class="prog-track"><div class="prog-fill" id="regProg"></div></div>
-          <span class="prog-lbl" id="progLbl">0 / 8 filled</span>
-        </div>
-
-        <form id="registerForm" novalidate>
-
-          <div class="fg" id="fg-rname">
-            <label class="flabel" for="rName">&#9670; Full Name</label>
-            <input class="finput" type="text" id="rName" placeholder="e.g. Anand Kumar" autocomplete="name"/>
-            <span class="ferr" id="rerr-name"></span>
-          </div>
-
-          <div class="fg" id="fg-rbranch">
-            <label class="flabel" for="rBranch">&#9670; Branch / Department</label>
-            <div class="sel-wrap">
-              <select class="finput" id="rBranch">
-                <option value="" disabled selected>Select your branch</option>
-                <option value="Electrical Engineering">Electrical Engineering</option>
-                <option value="Electrical Engineering (Industrial Control)">Electrical Engineering (Industrial Control)</option>
-                <option value="Electronics Engineering">Electronics Engineering</option>
-                <option value="Mechanical Engineering (Production)">Mechanical Engineering (Production)</option>
-                <option value="Civil Engineering">Civil Engineering</option>
-              </select>
-              <span class="sel-arr">&#9660;</span>
-            </div>
-            <span class="ferr" id="rerr-branch"></span>
-          </div>
-
-          <div class="fg" id="fg-renroll">
-            <label class="flabel" for="rEnroll">&#9670; Enrollment Number</label>
-            <input class="finput mono" type="text" id="rEnroll" placeholder="e.g. E23220932900034" maxlength="15"/>
-            <span class="ferr" id="rerr-enroll"></span>
-          </div>
-
-          <div class="fg" id="fg-rphone">
-            <label class="flabel" for="rPhone">&#9670; Phone Number</label>
-            <input class="finput" type="tel" id="rPhone" placeholder="10-digit mobile number" maxlength="10"/>
-            <span class="ferr" id="rerr-phone"></span>
-          </div>
-
-          <div class="fg" id="fg-rpass">
-            <label class="flabel" for="rPass">&#9670; Password</label>
-            <div class="pass-wrap">
-              <input class="finput" type="password" id="rPass" placeholder="Create a strong password"/>
-              <button type="button" class="eye-btn" onclick="toggleEye('rPass',this)">&#128065;</button>
-            </div>
-            <div class="strength-bar"><div class="strength-fill" id="sFill"></div></div>
-            <span class="ferr" id="rerr-pass"></span>
-          </div>
-
-          <!-- Security Questions -->
-          <div class="sq-box">
-            <div class="sq-title">&#128272; Security Questions <span class="sq-sub">— for password recovery</span></div>
-          </div>
-
-          <div class="fg" id="fg-rq1">
-            <label class="flabel" for="rQ1">&#9670; What is your Birth Place?</label>
-            <input class="finput" type="text" id="rQ1" placeholder="Your answer"/>
-            <span class="ferr" id="rerr-q1"></span>
-          </div>
-
-          <div class="fg" id="fg-rq2">
-            <label class="flabel" for="rQ2">&#9670; What is your Grandmother's name?</label>
-            <input class="finput" type="text" id="rQ2" placeholder="Your answer"/>
-            <span class="ferr" id="rerr-q2"></span>
-          </div>
-
-          <div class="fg" id="fg-rq3">
-            <label class="flabel" for="rQ3">&#9670; What is your favorite animal / pet?</label>
-            <input class="finput" type="text" id="rQ3" placeholder="Your answer"/>
-            <span class="ferr" id="rerr-q3"></span>
-          </div>
-
-          <button type="submit" class="main-btn" id="regBtn">
-            <span class="btn-txt">Create Account</span>
-            <span class="btn-arr">&#8594;</span>
-            <span class="btn-ld" style="display:none">&#9679;&#9679;&#9679;</span>
-          </button>
-
-        </form>
-
-        <p class="switch-txt">Already registered? <a href="#" onclick="switchTab('login');return false;">Sign In</a></p>
-      </div>
-
-      <!-- LOGIN CARD -->
-      <div class="auth-card" id="loginCard" style="display:none;">
-        <div class="card-eyebrow">Welcome Back</div>
-        <h2 class="card-title">Sign In</h2>
-        <p class="card-sub">Enter your enrollment number and password</p>
-
-        <form id="loginForm" novalidate>
-
-          <div class="fg" id="fg-lenroll">
-            <label class="flabel" for="lEnroll">&#9670; Enrollment Number</label>
-            <input class="finput mono" type="text" id="lEnroll" placeholder="e.g. E23220932900034" maxlength="15"/>
-            <span class="ferr" id="lerr-enroll"></span>
-          </div>
-
-          <div class="fg" id="fg-lpass">
-            <label class="flabel" for="lPass">&#9670; Password</label>
-            <div class="pass-wrap">
-              <input class="finput" type="password" id="lPass" placeholder="Enter your password"/>
-              <button type="button" class="eye-btn" onclick="toggleEye('lPass',this)">&#128065;</button>
-            </div>
-            <span class="ferr" id="lerr-pass"></span>
-          </div>
-
-          <div class="forgot-row">
-            <a href="#" onclick="openForgot();return false;">Forgot password?</a>
-          </div>
-
-          <button type="submit" class="main-btn" id="loginBtn">
-            <span class="btn-txt">Sign In</span>
-            <span class="btn-arr">&#8594;</span>
-            <span class="btn-ld" style="display:none">&#9679;&#9679;&#9679;</span>
-          </button>
-
-        </form>
-
-        <p class="switch-txt">New here? <a href="#" onclick="switchTab('register');return false;">Create Account</a></p>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- FORGOT PASSWORD MODAL -->
-  <div class="overlay" id="forgotOverlay">
-    <div class="modal-card" id="forgotModal">
-      <div class="modal-head">
-        <div>
-          <div class="card-eyebrow">Account Recovery</div>
-          <h3 class="card-title" style="font-size:1.6rem;">Reset Password</h3>
-        </div>
-        <button class="close-btn" onclick="closeForgot()">&#10005;</button>
-      </div>
-      <div class="modal-body">
-
-        <!-- Step A -->
-        <div id="fStepA">
-          <div class="fg">
-            <label class="flabel">&#9670; Enrollment Number</label>
-            <input class="finput mono" type="text" id="fEnroll" placeholder="E23220932900034" maxlength="15"/>
-            <span class="ferr" id="ferr-enroll"></span>
-          </div>
-          <button class="main-btn" onclick="fStep1()"><span>Find My Account</span><span>&#8594;</span></button>
-        </div>
-
-        <!-- Step B -->
-        <div id="fStepB" style="display:none;">
-          <div class="sq-box" style="margin-bottom:1rem;">
-            <div class="sq-title">&#9989; Account found! Now answer your security questions</div>
-          </div>
-          <div class="fg">
-            <label class="flabel">&#9670; What is your Birth Place?</label>
-            <input class="finput" type="text" id="fQ1" placeholder="Your answer"/>
-            <span class="ferr" id="ferr-fq1"></span>
-          </div>
-          <div class="fg">
-            <label class="flabel">&#9670; What is your Grandmother's name?</label>
-            <input class="finput" type="text" id="fQ2" placeholder="Your answer"/>
-            <span class="ferr" id="ferr-fq2"></span>
-          </div>
-          <div class="fg">
-            <label class="flabel">&#9670; What is your favorite animal / pet?</label>
-            <input class="finput" type="text" id="fQ3" placeholder="Your answer"/>
-            <span class="ferr" id="ferr-fq3"></span>
-          </div>
-          <button class="main-btn" onclick="fStep2()"><span>Verify Answers</span><span>&#8594;</span></button>
-        </div>
-
-        <!-- Step C -->
-        <div id="fStepC" style="display:none;">
-          <div class="sq-box" style="margin-bottom:1rem;">
-            <div class="sq-title">&#9989; Verified! Now set your new password</div>
-          </div>
-          <div class="fg">
-            <label class="flabel">&#9670; New Password</label>
-            <div class="pass-wrap">
-              <input class="finput" type="password" id="fNewPass" placeholder="Enter new password"/>
-              <button type="button" class="eye-btn" onclick="toggleEye('fNewPass',this)">&#128065;</button>
-            </div>
-            <span class="ferr" id="ferr-newpass"></span>
-          </div>
-          <button class="main-btn" onclick="fStep3()"><span>Reset Password</span><span>&#8594;</span></button>
-        </div>
-
-      </div>
+    <div class="cta-row">
+      <button class="btn btn-gold btn-large" onclick="openPopup('register')">Register Now</button>
+      <button class="btn btn-ghost btn-large" onclick="openPopup('login')">Already Registered?</button>
     </div>
   </div>
 
-  <!-- SUCCESS OVERLAY -->
-  <div class="success-overlay" id="successOv" style="display:none;">
-    <div class="success-box">
-      <div class="success-check">&#10003;</div>
-      <h2 class="success-title" id="successTitle">Done!</h2>
-      <p class="success-msg"  id="successMsg">Welcome to GP Gonda</p>
-      <button class="main-btn" style="max-width:260px;margin:0 auto;" onclick="goToDashboard()">
-        <span class="btn-txt">Go to Dashboard</span>
-        <span class="btn-arr">&#8594;</span>
-      </button>
+</div>
+
+
+<!-- ══════════════════════════════════
+     POPUP OVERLAY
+══════════════════════════════════ -->
+<div class="overlay hidden" id="overlay">
+  <div class="popup" id="popup">
+
+    <button class="popup-close" onclick="closePopup()">&#10005;</button>
+
+    <div class="popup-logo">
+      <div class="popup-logo-icon"><img src="logo.png" alt="GP Gonda Logo" style="width:36px;height:36px;object-fit:contain;border-radius:6px;"/></div>
     </div>
+    <h2 class="popup-title" id="popup-title">REGISTER</h2>
+    <p class="popup-subtitle">Government Polytechnic Gonda</p>
+
+    <!-- TABS -->
+    <div class="tab-row">
+      <button class="tab active" id="tab-register" onclick="switchTab('register')">Register</button>
+      <button class="tab" id="tab-login" onclick="switchTab('login')">Login</button>
+    </div>
+
+    <!-- MESSAGE BOX -->
+    <div class="msg-box" id="msg-box"></div>
+
+    <!-- ── REGISTER FORM ── -->
+    <div id="register-form" class="active">
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="reg-name" placeholder="Ex. Suraj Kumar Yadav"/>
+      </div>
+      <div class="field">
+        <label>Branch</label>
+        <select id="reg-branch">
+          <option value="" disabled selected>Select your branch</option>
+          <option>Electrical Engineering</option>
+          <option>Electrical Engineering (Industrial Control)</option>
+          <option>Electronics Engineering</option>
+          <option>Mechanical Engineering (Production)</option>
+          <option>Civil Engineering</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Enrollment No.</label>
+          <input type="text" id="reg-enroll" placeholder="Ex. E12345678901234"/>
+        </div>
+        <div class="field">
+          <label>Phone Number</label>
+          <input type="tel" id="reg-phone" placeholder="Ex. 9876543210" maxlength="10"/>
+        </div>
+      </div>
+      <p class="form-note">Your data will be saved securely on our server.</p>
+      <button class="btn-submit" id="reg-btn" onclick="handleRegister()">REGISTER</button>
+      <div class="switch-text">
+        Already have an account? <a onclick="switchTab('login')">Login here</a>
+      </div>
+    </div>
+
+    <!-- ── LOGIN FORM ── -->
+    <div id="login-form">
+      <div class="field">
+        <label>Enrollment No.</label>
+        <input type="text" id="login-enroll" placeholder="Ex. E12345678901234"/>
+      </div>
+      <div class="field">
+        <label>Phone Number</label>
+        <input type="tel" id="login-phone" placeholder="Ex. 9876543210" maxlength="10"/>
+      </div>
+      <p class="form-note">Enter your registered enrollment no. and phone number.</p>
+      <button class="btn-submit" id="login-btn" onclick="handleLogin()">LOGIN</button>
+      <div class="switch-text">
+        New student? <a onclick="switchTab('register')">Register here</a>
+      </div>
+    </div>
+
   </div>
+</div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast"></div>
 
-  <script src="script.js"></script>
+<!-- ══════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════ -->
+<script>
+  const BIN_ID  = '6a07f6fac0954111d82ee279';
+  const API_KEY = '$2a$10$ntQbtOWUeUXOnQqmVNx5/.SmTfpLHr4.X412ILQ7aTEtD5/NhMybw';
+  const BASE    = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+  // ── Popup control ──
+  function openPopup(tab) {
+    document.getElementById('overlay').classList.remove('hidden');
+    clearMsg();
+    switchTab(tab || 'register');
+  }
+  function closePopup() {
+    document.getElementById('overlay').classList.add('hidden');
+    clearMsg();
+  }
+  // Close on overlay click
+  document.getElementById('overlay').addEventListener('click', function(e) {
+    if (e.target === this) closePopup();
+  });
+
+  function switchTab(tab) {
+    const isReg = tab === 'register';
+    document.getElementById('tab-register').classList.toggle('active', isReg);
+    document.getElementById('tab-login').classList.toggle('active', !isReg);
+    document.getElementById('register-form').classList.toggle('active', isReg);
+    document.getElementById('login-form').classList.toggle('active', !isReg);
+    document.getElementById('popup-title').textContent = isReg ? 'REGISTER' : 'LOGIN';
+    clearMsg();
+  }
+
+  function showMsg(text, type) {
+    const box = document.getElementById('msg-box');
+    box.textContent = text;
+    box.className = 'msg-box ' + type;
+  }
+  function clearMsg() {
+    const box = document.getElementById('msg-box');
+    box.textContent = '';
+    box.className = 'msg-box';
+  }
+
+  function setLoading(btnId, loading, text) {
+    const btn = document.getElementById(btnId);
+    if (loading) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>' + text;
+    } else {
+      btn.disabled = false;
+      btn.textContent = text;
+    }
+  }
+
+  // ── Fetch all students from jsonbin ──
+  async function fetchStudents() {
+    const res = await fetch(BASE + '/latest', {
+      headers: { 'X-Master-Key': API_KEY }
+    });
+    if (!res.ok) throw new Error('Server error: ' + res.status);
+    const data = await res.json();
+    // data.record should be { students: [...] }
+    return data.record && data.record.students ? data.record.students : [];
+  }
+
+  // ── Save updated student list to jsonbin ──
+  async function saveStudents(students) {
+    const res = await fetch(BASE, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': API_KEY
+      },
+      body: JSON.stringify({ students })
+    });
+    if (!res.ok) throw new Error('Save failed: ' + res.status);
+    return res.json();
+  }
+
+  // ── REGISTER ──
+  async function handleRegister() {
+    clearMsg();
+    const name   = document.getElementById('reg-name').value.trim();
+    const branch = document.getElementById('reg-branch').value;
+    const enroll = document.getElementById('reg-enroll').value.trim();
+    const phone  = document.getElementById('reg-phone').value.trim();
+
+    // Basic validation
+    if (!name)   return showMsg('⚠ Please enter your full name.', 'error');
+    if (!branch) return showMsg('⚠ Please select your branch.', 'error');
+    if (!enroll) return showMsg('⚠ Please enter your enrollment number.', 'error');
+    if (!/^\d{10}$/.test(phone)) return showMsg('⚠ Phone number must be exactly 10 digits.', 'error');
+
+    setLoading('reg-btn', true, 'Checking...');
+
+    try {
+      const students = await fetchStudents();
+
+      // Check if enrollment already exists
+      const exists = students.find(s => s.enrollmentNo.toLowerCase() === enroll.toLowerCase());
+      if (exists) {
+        showMsg('⚠ User already exists! Please change Name or Mobile Number, or try to Login.', 'error');
+        setLoading('reg-btn', false, 'REGISTER');
+        return;
+      }
+
+      // Add new student
+      const newStudent = {
+        fullName: name,
+        branch: branch,
+        enrollmentNo: enroll,
+        phone: phone,
+        registeredAt: new Date().toISOString()
+      };
+      students.push(newStudent);
+
+      setLoading('reg-btn', true, 'Saving...');
+      await saveStudents(students);
+
+      showMsg('✓ Registration successful! Welcome, ' + name.split(' ')[0] + '!', 'success');
+      // Clear fields
+      document.getElementById('reg-name').value = '';
+      document.getElementById('reg-branch').value = '';
+      document.getElementById('reg-enroll').value = '';
+      document.getElementById('reg-phone').value = '';
+
+    } catch (err) {
+      showMsg('✗ Error: ' + err.message + '. Please try again.', 'error');
+    }
+
+    setLoading('reg-btn', false, 'REGISTER');
+  }
+
+  // ── LOGIN ──
+  async function handleLogin() {
+    clearMsg();
+    const enroll = document.getElementById('login-enroll').value.trim();
+    const phone  = document.getElementById('login-phone').value.trim();
+
+    if (!enroll) return showMsg('⚠ Please enter your enrollment number.', 'error');
+    if (!phone)  return showMsg('⚠ Please enter your phone number.', 'error');
+
+    setLoading('login-btn', true, 'Checking...');
+
+    try {
+      const students = await fetchStudents();
+      const student = students.find(
+        s => s.enrollmentNo.toLowerCase() === enroll.toLowerCase() && s.phone === phone
+      );
+
+      if (student) {
+        showMsg('✓ Welcome back, ' + student.fullName.split(' ')[0] + '! (' + student.branch + ')', 'success');
+        document.getElementById('login-enroll').value = '';
+        document.getElementById('login-phone').value = '';
+      } else {
+        showMsg('✗ No account found. Please check your Enrollment No. or Phone Number.', 'error');
+      }
+
+    } catch (err) {
+      showMsg('✗ Error: ' + err.message + '. Please try again.', 'error');
+    }
+
+    setLoading('login-btn', false, 'LOGIN');
+  }
+
+  // ── Auto-open register popup on load ──
+  window.addEventListener('load', () => {
+    setTimeout(() => openPopup('register'), 600);
+  });
+</script>
+
 </body>
 </html>
