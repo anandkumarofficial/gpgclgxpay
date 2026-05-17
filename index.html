@@ -5,95 +5,82 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>GP Gonda — Event Payment Tracker</title>
   <link rel="stylesheet" href="style.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 </head>
 <body>
 
-  <!-- Animated background -->
-  <div class="bg-wrap">
-    <div class="bg-orb orb1"></div>
-    <div class="bg-orb orb2"></div>
-    <div class="bg-orb orb3"></div>
-    <div class="bg-noise"></div>
-    <div class="bg-grid"></div>
-  </div>
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
 
-  <!-- ===== HEADER ===== -->
+  <!-- HEADER -->
   <header class="site-header">
     <div class="header-inner">
       <div class="brand">
         <div class="brand-logo">
-          <img src="logo.png" alt="GP Gonda" id="headerLogo" onerror="this.style.display='none';document.getElementById('headerLogoFb').style.display='flex'"/>
-          <div class="brand-logo-fb" id="headerLogoFb">GP</div>
+          <img src="logo.png" alt="GP Gonda" onerror="this.style.display='none';document.getElementById('logoFb').style.display='flex'"/>
+          <div class="brand-logo-fb" id="logoFb">GP</div>
         </div>
         <div class="brand-text">
-          <span class="brand-name">Govt. Polytechnic Gonda</span>
-          <span class="brand-tag">Event Payment Tracker</span>
+          <span class="brand-name">Government Polytechnic Gonda</span>
+          <span class="brand-sub">Event Payment Tracker</span>
         </div>
       </div>
       <div class="header-pill">Student Portal</div>
     </div>
   </header>
 
-  <!-- ===== MAIN CONTENT ===== -->
-  <main class="main-wrap">
-
-    <!-- Left decorative side -->
-    <div class="deco-side">
-      <div class="deco-title">
-        <span class="deco-line"></span>
-        <p>Government</p>
-        <p>Polytechnic</p>
-        <p class="deco-accent">Gonda</p>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-tag">Welcome</div>
+      <h1 class="hero-title">
+        One Place.<br/>
+        <span class="hero-accent">All Payments.</span>
+      </h1>
+      <p class="hero-desc">
+        Register once and track every event payment for Government Polytechnic Gonda — from any device, anytime.
+      </p>
+      <div class="hero-stats">
+        <div class="hstat"><span class="hstat-n">200+</span><span class="hstat-l">Students</span></div>
+        <div class="hstat-div"></div>
+        <div class="hstat"><span class="hstat-n">Live</span><span class="hstat-l">Tracking</span></div>
+        <div class="hstat-div"></div>
+        <div class="hstat"><span class="hstat-n">Free</span><span class="hstat-l">Always</span></div>
       </div>
-      <div class="deco-stats">
-        <div class="deco-stat"><span class="ds-val">200+</span><span class="ds-lbl">Students</span></div>
-        <div class="deco-stat"><span class="ds-val">Free</span><span class="ds-lbl">Forever</span></div>
-        <div class="deco-stat"><span class="ds-val">Live</span><span class="ds-lbl">Tracking</span></div>
-      </div>
-      <div class="deco-motto">"Work is Worship"</div>
     </div>
 
-    <!-- Right — Auth Card -->
-    <div class="auth-side">
+    <div class="hero-right">
 
       <!-- TAB SWITCHER -->
       <div class="auth-tabs">
-        <button class="auth-tab active" id="tabRegister" onclick="switchTab('register')">Register</button>
-        <button class="auth-tab" id="tabLogin" onclick="switchTab('login')">Sign In</button>
-        <div class="tab-slider" id="tabSlider"></div>
+        <button class="auth-tab active" id="tabReg" onclick="switchTab('register')">Register</button>
+        <button class="auth-tab" id="tabLog" onclick="switchTab('login')">Sign In</button>
+        <div class="tab-ink" id="tabInk"></div>
       </div>
 
-      <!-- ===== REGISTER FORM ===== -->
+      <!-- REGISTER CARD -->
       <div class="auth-card" id="registerCard">
-        <div class="auth-card-header">
-          <h2 class="auth-card-title">Create Account</h2>
-          <p class="auth-card-sub">Fill in your details to get started</p>
+        <div class="card-eyebrow">Step 1 of 1</div>
+        <h2 class="card-title">Create Account</h2>
+        <p class="card-sub">Fill your details to get started</p>
+
+        <!-- Progress -->
+        <div class="prog-wrap">
+          <div class="prog-track"><div class="prog-fill" id="regProg"></div></div>
+          <span class="prog-lbl" id="progLbl">0 / 8 filled</span>
         </div>
 
         <form id="registerForm" novalidate>
 
-          <!-- Progress bar -->
-          <div class="form-progress">
-            <div class="fp-track"><div class="fp-fill" id="regProgress"></div></div>
-            <span class="fp-label" id="regProgressLabel">0 / 9 filled</span>
-          </div>
-
-          <!-- Full Name -->
           <div class="fg" id="fg-rname">
-            <label class="flabel" for="rName">Full Name</label>
-            <div class="finput-wrap">
-              <span class="finput-icon">◈</span>
-              <input class="finput" type="text" id="rName" placeholder="e.g. Anand Kumar" autocomplete="name"/>
-            </div>
+            <label class="flabel" for="rName">&#9670; Full Name</label>
+            <input class="finput" type="text" id="rName" placeholder="e.g. Anand Kumar" autocomplete="name"/>
             <span class="ferr" id="rerr-name"></span>
           </div>
 
-          <!-- Branch -->
           <div class="fg" id="fg-rbranch">
-            <label class="flabel" for="rBranch">Branch / Department</label>
-            <div class="finput-wrap select-wrap">
-              <span class="finput-icon">◈</span>
+            <label class="flabel" for="rBranch">&#9670; Branch / Department</label>
+            <div class="sel-wrap">
               <select class="finput" id="rBranch">
                 <option value="" disabled selected>Select your branch</option>
                 <option value="Electrical Engineering">Electrical Engineering</option>
@@ -102,215 +89,182 @@
                 <option value="Mechanical Engineering (Production)">Mechanical Engineering (Production)</option>
                 <option value="Civil Engineering">Civil Engineering</option>
               </select>
-              <span class="sel-arrow">▾</span>
+              <span class="sel-arr">&#9660;</span>
             </div>
             <span class="ferr" id="rerr-branch"></span>
           </div>
 
-          <!-- Enrollment -->
           <div class="fg" id="fg-renroll">
-            <label class="flabel" for="rEnroll">Enrollment Number</label>
-            <div class="finput-wrap">
-              <span class="finput-icon">◈</span>
-              <input class="finput mono" type="text" id="rEnroll" placeholder="e.g. E23220932900034" maxlength="15"/>
-            </div>
+            <label class="flabel" for="rEnroll">&#9670; Enrollment Number</label>
+            <input class="finput mono" type="text" id="rEnroll" placeholder="e.g. E23220932900034" maxlength="15"/>
             <span class="ferr" id="rerr-enroll"></span>
           </div>
 
-          <!-- Phone -->
           <div class="fg" id="fg-rphone">
-            <label class="flabel" for="rPhone">Phone Number</label>
-            <div class="finput-wrap">
-              <span class="finput-icon">◈</span>
-              <input class="finput" type="tel" id="rPhone" placeholder="10-digit mobile number" maxlength="10"/>
-            </div>
+            <label class="flabel" for="rPhone">&#9670; Phone Number</label>
+            <input class="finput" type="tel" id="rPhone" placeholder="10-digit mobile number" maxlength="10"/>
             <span class="ferr" id="rerr-phone"></span>
           </div>
 
-          <!-- Password -->
           <div class="fg" id="fg-rpass">
-            <label class="flabel" for="rPass">Password</label>
-            <div class="finput-wrap">
-              <span class="finput-icon">◈</span>
+            <label class="flabel" for="rPass">&#9670; Password</label>
+            <div class="pass-wrap">
               <input class="finput" type="password" id="rPass" placeholder="Create a strong password"/>
-              <button type="button" class="eye-btn" onclick="togglePass('rPass',this)">👁</button>
+              <button type="button" class="eye-btn" onclick="toggleEye('rPass',this)">&#128065;</button>
             </div>
-            <div class="pass-strength" id="passStrength"><div class="ps-bar" id="psBar"></div></div>
+            <div class="strength-bar"><div class="strength-fill" id="sFill"></div></div>
             <span class="ferr" id="rerr-pass"></span>
           </div>
 
           <!-- Security Questions -->
-          <div class="sq-header">
-            <span class="sq-icon">🔐</span>
-            <div>
-              <p class="sq-title">Security Questions</p>
-              <p class="sq-sub">Used to recover your account if you forget password</p>
-            </div>
+          <div class="sq-box">
+            <div class="sq-title">&#128272; Security Questions <span class="sq-sub">— for password recovery</span></div>
           </div>
 
-          <!-- Q1 -->
           <div class="fg" id="fg-rq1">
-            <label class="flabel">What is your Birth Place?</label>
-            <div class="finput-wrap">
-              <span class="finput-icon">◈</span>
-              <input class="finput" type="text" id="rQ1" placeholder="Your answer"/>
-            </div>
+            <label class="flabel" for="rQ1">&#9670; What is your Birth Place?</label>
+            <input class="finput" type="text" id="rQ1" placeholder="Your answer"/>
             <span class="ferr" id="rerr-q1"></span>
           </div>
 
-          <!-- Q2 -->
           <div class="fg" id="fg-rq2">
-            <label class="flabel">What is your Grandmother's name?</label>
-            <div class="finput-wrap">
-              <span class="finput-icon">◈</span>
-              <input class="finput" type="text" id="rQ2" placeholder="Your answer"/>
-            </div>
+            <label class="flabel" for="rQ2">&#9670; What is your Grandmother's name?</label>
+            <input class="finput" type="text" id="rQ2" placeholder="Your answer"/>
             <span class="ferr" id="rerr-q2"></span>
           </div>
 
-          <!-- Q3 -->
           <div class="fg" id="fg-rq3">
-            <label class="flabel">What is your favorite animal / pet?</label>
-            <div class="finput-wrap">
-              <span class="finput-icon">◈</span>
-              <input class="finput" type="text" id="rQ3" placeholder="Your answer"/>
-            </div>
+            <label class="flabel" for="rQ3">&#9670; What is your favorite animal / pet?</label>
+            <input class="finput" type="text" id="rQ3" placeholder="Your answer"/>
             <span class="ferr" id="rerr-q3"></span>
           </div>
 
-          <button type="submit" class="auth-btn" id="regBtn">
-            <span class="auth-btn-text">Create Account</span>
-            <span class="auth-btn-arrow">→</span>
-            <span class="auth-btn-loader" style="display:none">···</span>
+          <button type="submit" class="main-btn" id="regBtn">
+            <span class="btn-txt">Create Account</span>
+            <span class="btn-arr">&#8594;</span>
+            <span class="btn-ld" style="display:none">&#9679;&#9679;&#9679;</span>
           </button>
 
         </form>
 
-        <p class="auth-switch">Already have an account? <a href="#" onclick="switchTab('login');return false;">Sign In here</a></p>
+        <p class="switch-txt">Already registered? <a href="#" onclick="switchTab('login');return false;">Sign In</a></p>
       </div>
 
-      <!-- ===== LOGIN FORM ===== -->
+      <!-- LOGIN CARD -->
       <div class="auth-card" id="loginCard" style="display:none;">
-        <div class="auth-card-header">
-          <h2 class="auth-card-title">Welcome Back</h2>
-          <p class="auth-card-sub">Sign in to your account</p>
-        </div>
+        <div class="card-eyebrow">Welcome Back</div>
+        <h2 class="card-title">Sign In</h2>
+        <p class="card-sub">Enter your enrollment number and password</p>
 
         <form id="loginForm" novalidate>
 
-          <!-- Enrollment -->
           <div class="fg" id="fg-lenroll">
-            <label class="flabel" for="lEnroll">Enrollment Number</label>
-            <div class="finput-wrap">
-              <span class="finput-icon">◈</span>
-              <input class="finput mono" type="text" id="lEnroll" placeholder="e.g. E23220932900034" maxlength="15"/>
-            </div>
+            <label class="flabel" for="lEnroll">&#9670; Enrollment Number</label>
+            <input class="finput mono" type="text" id="lEnroll" placeholder="e.g. E23220932900034" maxlength="15"/>
             <span class="ferr" id="lerr-enroll"></span>
           </div>
 
-          <!-- Password -->
           <div class="fg" id="fg-lpass">
-            <label class="flabel" for="lPass">Password</label>
-            <div class="finput-wrap">
-              <span class="finput-icon">◈</span>
+            <label class="flabel" for="lPass">&#9670; Password</label>
+            <div class="pass-wrap">
               <input class="finput" type="password" id="lPass" placeholder="Enter your password"/>
-              <button type="button" class="eye-btn" onclick="togglePass('lPass',this)">👁</button>
+              <button type="button" class="eye-btn" onclick="toggleEye('lPass',this)">&#128065;</button>
             </div>
             <span class="ferr" id="lerr-pass"></span>
           </div>
 
           <div class="forgot-row">
-            <a href="#" id="forgotLink" onclick="showForgot();return false;">Forgot password?</a>
+            <a href="#" onclick="openForgot();return false;">Forgot password?</a>
           </div>
 
-          <button type="submit" class="auth-btn" id="loginBtn">
-            <span class="auth-btn-text">Sign In</span>
-            <span class="auth-btn-arrow">→</span>
-            <span class="auth-btn-loader" style="display:none">···</span>
+          <button type="submit" class="main-btn" id="loginBtn">
+            <span class="btn-txt">Sign In</span>
+            <span class="btn-arr">&#8594;</span>
+            <span class="btn-ld" style="display:none">&#9679;&#9679;&#9679;</span>
           </button>
 
         </form>
 
-        <p class="auth-switch">New here? <a href="#" onclick="switchTab('register');return false;">Create an account</a></p>
+        <p class="switch-txt">New here? <a href="#" onclick="switchTab('register');return false;">Create Account</a></p>
       </div>
 
-    </div><!-- /auth-side -->
-  </main>
+    </div>
+  </section>
 
-  <!-- ===== FORGOT PASSWORD MODAL ===== -->
-  <div class="modal-overlay" id="forgotOverlay">
-    <div class="modal-box" id="forgotModal">
-      <div class="modal-top">
+  <!-- FORGOT PASSWORD MODAL -->
+  <div class="overlay" id="forgotOverlay">
+    <div class="modal-card" id="forgotModal">
+      <div class="modal-head">
         <div>
-          <div class="modal-eyebrow">Account Recovery</div>
-          <h3 class="modal-title">Reset Password</h3>
-          <p class="modal-sub">Answer your security questions to reset your password</p>
+          <div class="card-eyebrow">Account Recovery</div>
+          <h3 class="card-title" style="font-size:1.6rem;">Reset Password</h3>
         </div>
-        <button class="modal-x" onclick="closeForgot()">✕</button>
+        <button class="close-btn" onclick="closeForgot()">&#10005;</button>
       </div>
       <div class="modal-body">
 
-        <!-- Step A: Enter Enrollment -->
-        <div id="forgotStepA">
+        <!-- Step A -->
+        <div id="fStepA">
           <div class="fg">
-            <label class="flabel">Enrollment Number</label>
-            <div class="finput-wrap">
-              <span class="finput-icon">◈</span>
-              <input class="finput mono" type="text" id="fEnroll" placeholder="E23220932900034" maxlength="15"/>
-            </div>
+            <label class="flabel">&#9670; Enrollment Number</label>
+            <input class="finput mono" type="text" id="fEnroll" placeholder="E23220932900034" maxlength="15"/>
             <span class="ferr" id="ferr-enroll"></span>
           </div>
-          <button class="auth-btn" onclick="forgotStep1()">
-            <span>Find My Account</span><span>→</span>
-          </button>
+          <button class="main-btn" onclick="fStep1()"><span>Find My Account</span><span>&#8594;</span></button>
         </div>
 
-        <!-- Step B: Answer Questions -->
-        <div id="forgotStepB" style="display:none;">
+        <!-- Step B -->
+        <div id="fStepB" style="display:none;">
+          <div class="sq-box" style="margin-bottom:1rem;">
+            <div class="sq-title">&#9989; Account found! Now answer your security questions</div>
+          </div>
           <div class="fg">
-            <label class="flabel">What is your Birth Place?</label>
-            <div class="finput-wrap"><span class="finput-icon">◈</span><input class="finput" type="text" id="fQ1" placeholder="Your answer"/></div>
+            <label class="flabel">&#9670; What is your Birth Place?</label>
+            <input class="finput" type="text" id="fQ1" placeholder="Your answer"/>
             <span class="ferr" id="ferr-fq1"></span>
           </div>
           <div class="fg">
-            <label class="flabel">What is your Grandmother's name?</label>
-            <div class="finput-wrap"><span class="finput-icon">◈</span><input class="finput" type="text" id="fQ2" placeholder="Your answer"/></div>
+            <label class="flabel">&#9670; What is your Grandmother's name?</label>
+            <input class="finput" type="text" id="fQ2" placeholder="Your answer"/>
             <span class="ferr" id="ferr-fq2"></span>
           </div>
           <div class="fg">
-            <label class="flabel">What is your favorite animal / pet?</label>
-            <div class="finput-wrap"><span class="finput-icon">◈</span><input class="finput" type="text" id="fQ3" placeholder="Your answer"/></div>
+            <label class="flabel">&#9670; What is your favorite animal / pet?</label>
+            <input class="finput" type="text" id="fQ3" placeholder="Your answer"/>
             <span class="ferr" id="ferr-fq3"></span>
           </div>
-          <button class="auth-btn" onclick="forgotStep2()"><span>Verify Answers</span><span>→</span></button>
+          <button class="main-btn" onclick="fStep2()"><span>Verify Answers</span><span>&#8594;</span></button>
         </div>
 
-        <!-- Step C: New Password -->
-        <div id="forgotStepC" style="display:none;">
+        <!-- Step C -->
+        <div id="fStepC" style="display:none;">
+          <div class="sq-box" style="margin-bottom:1rem;">
+            <div class="sq-title">&#9989; Verified! Now set your new password</div>
+          </div>
           <div class="fg">
-            <label class="flabel">New Password</label>
-            <div class="finput-wrap">
-              <span class="finput-icon">◈</span>
+            <label class="flabel">&#9670; New Password</label>
+            <div class="pass-wrap">
               <input class="finput" type="password" id="fNewPass" placeholder="Enter new password"/>
-              <button type="button" class="eye-btn" onclick="togglePass('fNewPass',this)">👁</button>
+              <button type="button" class="eye-btn" onclick="toggleEye('fNewPass',this)">&#128065;</button>
             </div>
             <span class="ferr" id="ferr-newpass"></span>
           </div>
-          <button class="auth-btn" onclick="forgotStep3()"><span>Reset Password</span><span>→</span></button>
+          <button class="main-btn" onclick="fStep3()"><span>Reset Password</span><span>&#8594;</span></button>
         </div>
 
       </div>
     </div>
   </div>
 
-  <!-- ===== SUCCESS OVERLAY ===== -->
-  <div class="success-overlay" id="successOverlay" style="display:none;">
+  <!-- SUCCESS OVERLAY -->
+  <div class="success-overlay" id="successOv" style="display:none;">
     <div class="success-box">
-      <div class="success-check">✓</div>
-      <h2 class="success-title" id="successTitle">Registered!</h2>
-      <p class="success-msg" id="successMsg">Welcome to GP Gonda Tracker</p>
-      <button class="auth-btn" onclick="goToDashboard()">
-        <span>Go to Dashboard</span><span>→</span>
+      <div class="success-check">&#10003;</div>
+      <h2 class="success-title" id="successTitle">Done!</h2>
+      <p class="success-msg"  id="successMsg">Welcome to GP Gonda</p>
+      <button class="main-btn" style="max-width:260px;margin:0 auto;" onclick="goToDashboard()">
+        <span class="btn-txt">Go to Dashboard</span>
+        <span class="btn-arr">&#8594;</span>
       </button>
     </div>
   </div>
